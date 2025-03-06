@@ -55,7 +55,7 @@ def test_vision_model(test_id, image_url, text, expected_status):
     logging.info(f"Running {test_id}...")
 
     try:
-        response = requests.post(VISION_API_URL, headers=headers, json=data, timeout=20)
+        response = requests.post(TEXT_API_URL, headers=headers, json=data, timeout=20)
         response.raise_for_status()
 
         assert response.status_code == expected_status, f"Expected {expected_status}, got {response.status_code}"
