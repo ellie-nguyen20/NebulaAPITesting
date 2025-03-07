@@ -20,7 +20,7 @@ Before running the tests, ensure you have the following installed:
    ```sh
    python -m venv venv
    source venv/bin/activate  # On macOS/Linux
-   venv\Scripts\activate  # On Windows
+   venv\Scripts\activate.bat  # On Windows
    ```
 3. Install dependencies:
    ```sh
