@@ -13,6 +13,7 @@ test_cases = [
     ("TC_06_NoAPIKey", "A sunset over the ocean", 401),
 ]
 
+
 @pytest.mark.parametrize("test_id, prompt, expected_status", test_cases)
 def test_nebula_flux_image_api(test_id, prompt, expected_status):
     """Test API generate image với model FLUX.1-schnell"""
