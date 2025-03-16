@@ -3,7 +3,6 @@ import requests
 import pytest
 import logging
 
-
 test_cases = [
     ("TC_00_CheckConnection", ["Test connection"], 200),
     ("TC_01_ValidRequest", [
@@ -15,9 +14,9 @@ test_cases = [
     ("TC_04_NoAPIKey", ["Testing without API key"], 401),
 ]
 
+
 @pytest.mark.parametrize("test_id, input_text, expected_status", test_cases)
 def test_nebula_embedding_api(test_id, input_text, expected_status):
-
     headers = {"Content-Type": "application/json"}
 
     if test_id not in ["TC_03_InvalidAPIKey", "TC_04_NoAPIKey"]:

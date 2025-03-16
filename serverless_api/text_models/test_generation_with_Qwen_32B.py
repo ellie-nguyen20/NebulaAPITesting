@@ -3,7 +3,6 @@ import requests
 import pytest
 import logging
 
-
 # test case
 test_cases = [
     ("TC_00_CheckConnection", "Is this API working correctly?", 200),
@@ -14,6 +13,7 @@ test_cases = [
     ("TC_05_InvalidAPIKey", "Hello", 401),
     ("TC_06_NoAPIKey", "Hello", 401),
 ]
+
 
 @pytest.mark.parametrize("test_id, prompt, expected_status", test_cases)
 def test_model_api(test_id, prompt, expected_status):
@@ -40,9 +40,7 @@ def test_model_api(test_id, prompt, expected_status):
         response = requests.post(TEXT_API_URL, headers=headers, json=data, timeout=10)
         response.raise_for_status()
 
-
         assert response.status_code == expected_status, f"Expected {expected_status}, got {response.status_code}"
-
 
         if response.status_code == 200:
             result = response.json()
@@ -58,4 +56,3 @@ def test_model_api(test_id, prompt, expected_status):
         logging.error(f"{test_id} ❌ Failed! Error: {str(e)}")
         test_results.append((test_id, "❌ Failed", str(e)))
         pytest.fail(f"{test_id} failed: {str(e)}", pytrace=True)
-

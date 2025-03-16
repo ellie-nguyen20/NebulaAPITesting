@@ -3,14 +3,14 @@ import pytest
 import logging
 from serverless_api.base_test import NEBULA_API_KEY, TEXT_API_URL, test_results
 
-
 test_cases = [
     ("TC_00_ValidRequest", "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg",
      "What is this image?", 200),
     ("TC_01_InvalidImageURL", "https://invalid-url.com/fake.jpg", "Describe this image.", 400),
     ("TC_02_NoImage", None, "What is in this image?", 400),
     (
-    "TC_03_NoAPIKey", "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg", "What is this?", 401),
+        "TC_03_NoAPIKey", "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg", "What is this?",
+        401),
     ("TC_04_EmptyText", "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg", "", 200),
     ("TC_05_LongText", "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg", "A" * 5000, 200),
     ("TC_06_SpecialCharacters", "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg", "🔥💡🚀✨🎨",
