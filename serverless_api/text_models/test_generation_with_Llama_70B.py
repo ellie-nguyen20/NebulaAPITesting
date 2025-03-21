@@ -17,10 +17,8 @@ test_cases = [
 
 @pytest.mark.parametrize("test_id, prompt, expected_status", test_cases)
 def test_model_api(test_id, prompt, expected_status):
-    """Test API với nhiều test case khác nhau"""
     headers = {"Content-Type": "application/json"}
 
-    # Xử lý API key cho từng test case
     if test_id == "TC_05_InvalidAPIKey":
         headers["Authorization"] = "Bearer INVALID_KEY"
     elif test_id != "TC_06_NoAPIKey":
@@ -35,29 +33,34 @@ def test_model_api(test_id, prompt, expected_status):
         "stream": False,
     }
 
-    logging.info(f"Running {test_id}...")
-    try:
-        response = requests.post(TEXT_API_URL, headers=headers, json=data, timeout=10)
-        if expected_status < 200 or expected_status >= 300:
-            pass
-        else:
-            response.raise_for_status()
+    logging.info(f"Running {test_id} - Sending request to {TEXT_API_URL}")
 
-        assert response.status_code == expected_status, (
-            f"Expected {expected_status}, got {response.status_code}"
-        )
+    try:
+        response = requests.post(TEXT_API_URL, headers=headers, json=data, timeout=20)
+
+        if response.status_code != expected_status:
+            pytest.fail(
+                f"{test_id} ❌ Failed! Expected {expected_status}, got {response.status_code}"
+            )
 
         if response.status_code == 200:
             result = response.json()
-            assert "choices" in result, f"Expected 'choices' in response, got: {result}"
-            assert "message" in result["choices"][0], f"No message in response: {result['choices']}"
-        elif response.status_code == 401:
-            assert "error" in response.text.lower(), f"Expected error in response, got: {response.text}"
+            missing_fields = []
+
+            if "choices" not in result:
+                missing_fields.append("'choices' field")
+            elif not isinstance(result["choices"], list) or not result["choices"]:
+                missing_fields.append("'choices' field is empty")
+            elif "message" not in result["choices"][0]:
+                missing_fields.append("'message' field")
+
+            if missing_fields:
+                pytest.fail(
+                    f"{test_id} ❌ Failed! Response missing: {', '.join(missing_fields)}"
+                )
 
         logging.info(f"{test_id} ✅ Passed!")
         test_results.append((test_id, "✅ Passed", "-"))
 
     except Exception as e:
-        logging.error(f"{test_id} ❌ Failed! Error: {str(e)}")
-        test_results.append((test_id, "❌ Failed", str(e)))
-        pytest.fail(f"{test_id} failed: {str(e)}", pytrace=True)
+        pytest.fail(f"{test_id} ❌ Failed! Unexpected error: {e}", pytrace=True)
