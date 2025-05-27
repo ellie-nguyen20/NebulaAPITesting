@@ -11,7 +11,9 @@ from rich.console import Console
 from rich.table import Table
 
 # config logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 # Get the absolute path of the directory where this script is located
 script_dir = os.path.dirname(os.path.abspath(__file__))
