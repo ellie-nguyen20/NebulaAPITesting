@@ -1,6 +1,5 @@
 import pytest
 import requests
-import logging
 
 test_cases = [
     ("TC_00_CheckConnection", ["Test connection"], 200),
@@ -15,7 +14,7 @@ test_cases = [
 def build_headers(test_id, config):
     headers = {"Content-Type": "application/json"}
     if test_id == "TC_05_InvalidAPIKey":
-        headers["Authorization"] = "Bearer INVALID_KEY"
+        headers["Authorization"] = "Bearer INVALID_API_KEY"
     elif test_id != "TC_06_NoAPIKey":
         headers["Authorization"] = f"Bearer {config['api_key']}"
     return headers
@@ -29,11 +28,9 @@ def validate_response(test_id, result):
 def test_nebula_embedding_api(test_id, input_text, expected_status, config):
     headers = build_headers(test_id, config)
 
-    payload = {"model": "BAAI/bge-large-en-v1.5", "input": input_text}
+    payload = {"model": "togethercomputer/m2-bert-80M-32k-retrieval", "input": input_text}
 
-    logging.info(f"Running {test_id} - Sending request to {config['embedding_base_url']}")
-
-    response = requests.post(config['embedding_base_url'], headers=headers, json=payload, timeout=20)
+    response = requests.post( config["embedding_base_url"], headers=headers, json=payload, timeout=20)
 
     assert response.status_code == expected_status, f"{test_id}: Expected {expected_status}, got {response.status_code}"
 

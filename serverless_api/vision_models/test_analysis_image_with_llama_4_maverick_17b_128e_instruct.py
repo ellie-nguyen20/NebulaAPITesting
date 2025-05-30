@@ -84,7 +84,7 @@ def test_vision_model(test_id, image_url, text, expected_status, config):
 
     data = {
         "messages": messages,
-        "model": "Qwen/Qwen2.5-VL-7B-Instruct",
+        "model": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
         "max_tokens": None,
         "temperature": 1,
         "top_p": 0.9,

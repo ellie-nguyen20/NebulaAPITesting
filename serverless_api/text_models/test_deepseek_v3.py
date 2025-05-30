@@ -32,7 +32,7 @@ def test_model_api(test_id, prompt, expected_status, config):
 
     payload = {
         "messages": [{"role": "user", "content": prompt}],
-        "model": "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B",
+        "model": "deepseek-ai/DeepSeek-V3-0324",
         "max_tokens": None,
         "temperature": 1,
         "top_p": 0.9,

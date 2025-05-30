@@ -1,8 +1,5 @@
-from serverless_api.base_test import NEBULA_API_KEY, EMBEDDING_API_URL, test_results
-import requests
 import pytest
-import logging
-
+import requests
 
 test_cases = [
     ("TC_00_CheckConnection", ["Test connection"], 200),
@@ -14,36 +11,28 @@ test_cases = [
     ("TC_06_NoAPIKey", ["No API Key test"], 401),
 ]
 
+def build_headers(test_id, config):
+    headers = {"Content-Type": "application/json"}
+    if test_id == "TC_05_InvalidAPIKey":
+        headers["Authorization"] = "Bearer INVALID_API_KEY"
+    elif test_id != "TC_06_NoAPIKey":
+        headers["Authorization"] = f"Bearer {config['api_key']}"
+    return headers
+
+def validate_response(test_id, result):
+    assert "data" in result, f"{test_id}: Response missing 'data' field"
+    assert isinstance(result["data"], list), f"{test_id}: 'data' is not a list"
+    assert "embedding" in result["data"][0], f"{test_id}: Missing 'embedding' in data"
 
 @pytest.mark.parametrize("test_id, input_text, expected_status", test_cases)
-def test_nebula_embedding_api(test_id, input_text, expected_status):
-    headers = {"Content-Type": "application/json"}
+def test_nebula_embedding_api(test_id, input_text, expected_status, config):
+    headers = build_headers(test_id, config)
 
-    if test_id not in ["TC_05_InvalidAPIKey", "TC_06_NoAPIKey"]:
-        headers["Authorization"] = f"Bearer {NEBULA_API_KEY}"
+    payload = {"model": "BAAI/bge-large-en-v1.5", "input": input_text}
 
-    data = {"model": "BAAI/bge-large-en-v1.5", "input": input_text}
+    response = requests.post( config["embedding_base_url"], headers=headers, json=payload, timeout=20)
 
-    logging.info(f"Running {test_id}...")
-    try:
-        response = requests.post(
-            EMBEDDING_API_URL, headers=headers, json=data, timeout=20
-        )
+    assert response.status_code == expected_status, f"{test_id}: Expected {expected_status}, got {response.status_code}"
 
-        if response.status_code != expected_status:
-            pytest.fail(f"Expected {expected_status}, got {response.status_code}")
-
-        if response.status_code == 200:
-            result = response.json()
-            if "data" not in result:
-                pytest.fail("Response missing 'data' field.")
-            if not isinstance(result["data"], list):
-                pytest.fail("Data field is not a list.")
-            if "embedding" not in result["data"][0]:
-                pytest.fail("Response missing 'embedding' field.")
-
-        logging.info(f"{test_id} ✅ Passed!")
-        test_results.append((test_id, "✅ Passed", "-"))
-
-    except Exception as e:
-        pytest.fail(f"{test_id} ❌ Failed! Unexpected error: {e}", pytrace=True)
+    if response.status_code == 200:
+        validate_response(test_id, response.json())

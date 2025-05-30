@@ -1,8 +1,6 @@
-from serverless_api.base_test import NEBULA_API_KEY, TEXT_API_URL, test_results
-import requests
 import pytest
+import requests
 import logging
-
 
 test_cases = [
     ("TC_00_CheckConnection", "Is this API working correctly?", 200),
@@ -14,53 +12,38 @@ test_cases = [
     ("TC_06_NoAPIKey", "Hello", 401),
 ]
 
+def build_headers(test_id, config):
+    headers = {"Content-Type": "application/json"}
+    if test_id == "TC_05_InvalidAPIKey":
+        headers["Authorization"] = "Bearer INVALID_API_KEY"
+    elif test_id != "TC_06_NoAPIKey":
+        headers["Authorization"] = f"Bearer {config['api_key']}"
+    return headers
+
+def validate_response(test_id, result):
+    assert "choices" in result, f"{test_id}: Response missing 'choices' field"
+    assert isinstance(result["choices"], list), f"{test_id}: 'choices' is not a list"
+    assert len(result["choices"]) > 0, f"{test_id}: 'choices' is empty"
+    assert "message" in result["choices"][0], f"{test_id}: Missing 'message' in first choice"
 
 @pytest.mark.parametrize("test_id, prompt, expected_status", test_cases)
-def test_model_api(test_id, prompt, expected_status):
-    headers = {"Content-Type": "application/json"}
+def test_model_api(test_id, prompt, expected_status, config):
+    headers = build_headers(test_id, config)
 
-    if test_id == "TC_05_InvalidAPIKey":
-        headers["Authorization"] = "Bearer INVALID_KEY"
-    elif test_id != "TC_06_NoAPIKey":
-        headers["Authorization"] = f"Bearer {NEBULA_API_KEY}"
-
-    data = {
+    payload = {
         "messages": [{"role": "user", "content": prompt}],
-        "model": "meta-llama/Llama-3.3-70B-Instruct",
+        "model": "meta-llama/Llama-2-70b-chat-hf",
         "max_tokens": None,
         "temperature": 1,
         "top_p": 0.9,
         "stream": False,
     }
 
-    logging.info(f"Running {test_id} - Sending request to {TEXT_API_URL}")
+    logging.info(f"Running {test_id} - Sending request to {config['base_url']}")
 
-    try:
-        response = requests.post(TEXT_API_URL, headers=headers, json=data, timeout=20)
+    response = requests.post(config['base_url'], headers=headers, json=payload, timeout=20)
 
-        if response.status_code != expected_status:
-            pytest.fail(
-                f"{test_id} ❌ Failed! Expected {expected_status}, got {response.status_code}"
-            )
+    assert response.status_code == expected_status, f"{test_id}: Expected {expected_status}, got {response.status_code}"
 
-        if response.status_code == 200:
-            result = response.json()
-            missing_fields = []
-
-            if "choices" not in result:
-                missing_fields.append("'choices' field")
-            elif not isinstance(result["choices"], list) or not result["choices"]:
-                missing_fields.append("'choices' field is empty")
-            if "message" not in result["choices"][0]:
-                missing_fields.append("'message' field")
-
-            if missing_fields:
-                pytest.fail(
-                    f"{test_id} ❌ Failed! Response missing: {', '.join(missing_fields)}"
-                )
-
-        logging.info(f"{test_id} ✅ Passed!")
-        test_results.append((test_id, "✅ Passed", "-"))
-
-    except Exception as e:
-        pytest.fail(f"{test_id} ❌ Failed! Unexpected error: {e}", pytrace=True)
+    if response.status_code == 200:
+        validate_response(test_id, response.json())

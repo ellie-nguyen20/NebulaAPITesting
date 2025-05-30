@@ -27,12 +27,32 @@ Before running the tests, ensure you have the following installed:
    pip install -r requirements.txt
    ```
 
+## Configuration
+1. Create a `.env` file in the root directory with your API keys:
+   ```
+   NEBULA_API_KEY=your_api_key_here
+   ```
+
+2. The `config.yaml` file contains environment-specific configurations:
+   ```yaml
+   staging:
+     base_url: https://staging-api-url
+   production:
+     base_url: https://production-api-url
+   ```
+
 ## Running Tests
 
-### Run all tests
+### Environment Selection
+
+
+### Run all tests and Environment Selection
 To run all test cases under `serverless_api` and generate an HTML report:
    ```sh
-   pytest serverless_api --html=report.html --self-contained-html
+   pytest --html=report.html --self-contained-html # Staging and personal api key
+   pytest --key=team --html=report.html --self-contained-html # Staging and team api key
+   pytest --env=production --key=personal --html=report.html --self-contained-html # Production and personal api key
+   pytest --env=production --key=team --html=report.html --self-contained-html # Production and team api key
    ```
 
 ### Run tests for a specific subdirectory
