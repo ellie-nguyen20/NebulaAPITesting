@@ -1,25 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Reports</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 { 
+            color: #333;
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #eee;
+        }
+        .reports-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .report-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .report-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        .report-link {
+            color: #0366d6;
+            text-decoration: none;
+            display: block;
+            font-size: 16px;
+        }
+        .report-link:hover {
+            text-decoration: underline;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nebula API Test Reports</h1>
+    <ul class="reports-list">
 
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Test Reports</title>
-        <style>
-            body { font-family: Arial, sans-serif; margin: 20px; }
-            h1 { color: #333; }
-            ul { list-style-type: none; padding: 0; }
-            li { margin: 10px 0; }
-            a { color: #0366d6; text-decoration: none; }
-            a:hover { text-decoration: underline; }
-        </style>
-    </head>
-    <body>
-        <h1>Test Reports</h1>
-        <ul>
-            <li><a href="report_20250610_172951.html">report_20250610_172951.html</a></li>
-        <li><a href="report_20250610_172446.html">report_20250610_172446.html</a></li>
-        <li><a href="report_20250610_171509.html">report_20250610_171509.html</a></li>
-
-        </ul>
-    </body>
-    </html>
-    
+        <li class="report-item">
+            <a href="report_20250610_173240.html" class="report-link">report_20250610_173240.html</a>
+            <div class="timestamp">Generated on: 2025-06-10 17:32:40</div>
+        </li>
+        <li class="report-item">
+            <a href="report_20250610_172951.html" class="report-link">report_20250610_172951.html</a>
+            <div class="timestamp">Generated on: 2025-06-10 17:29:51</div>
+        </li>
+        <li class="report-item">
+            <a href="report_20250610_172446.html" class="report-link">report_20250610_172446.html</a>
+            <div class="timestamp">Generated on: 2025-06-10 17:24:46</div>
+        </li>
+        <li class="report-item">
+            <a href="report_20250610_171509.html" class="report-link">report_20250610_171509.html</a>
+            <div class="timestamp">Generated on: 2025-06-10 17:15:09</div>
+        </li>
+    </ul>
+</body>
+</html>
