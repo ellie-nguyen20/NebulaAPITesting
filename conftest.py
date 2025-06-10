@@ -21,8 +21,10 @@ def pytest_addoption(parser):
         "--key", action="store", default="personal", help="Choose API key type: personal or team"
     )
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def config(pytestconfig):
+    load_dotenv(override=True)
+
     env = pytestconfig.getoption("env")
     key_type = pytestconfig.getoption("key")
 
