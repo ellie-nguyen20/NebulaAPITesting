@@ -7,7 +7,7 @@ test_cases = [
     ("TC_01_ValidRequest", "Hello, how are you?", 200),
     ("TC_02_LongPrompt", "A" * 5000, 200),
     ("TC_03_SpecialCharacters", "What is 2+2? 😊", 200),
-    ("TC_04_EmptyPrompt", "", 200),
+    ("TC_04_EmptyPrompt", "", 400),
     ("TC_05_InvalidAPIKey", "Hello", 401),
     ("TC_06_NoAPIKey", "Hello", 401),
 ]

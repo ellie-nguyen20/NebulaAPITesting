@@ -4,7 +4,7 @@ import requests
 test_cases = [
     ("TC_00_CheckConnection", ["Test connection"], 200),
     ("TC_01_ValidRequest", ["Bananas are berries, but strawberries are not."], 200),
-    ("TC_02_EmptyInput", [""], 200),
+    ("TC_02_EmptyInput", [""], 400),
     ("TC_03_SpecialCharacters", ["!@#$%^&*()_+=-"], 200),
     ("TC_04_LongText", ["This is a long text. " * 500], 200),
     ("TC_05_InvalidAPIKey", ["Invalid API Key test"], 401),

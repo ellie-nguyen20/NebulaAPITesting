@@ -20,7 +20,7 @@ test_cases = [
         "TC_04_EmptyText",
         "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg",
         "",
-        200,
+        400,
     ),
     (
         "TC_05_LongText",
@@ -84,7 +84,7 @@ def test_vision_model(test_id, image_url, text, expected_status, config):
 
     data = {
         "messages": messages,
-        "model": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+        "model": "Qwen/Qwen2.5-VL-7B-Instruct",
         "max_tokens": None,
         "temperature": 1,
         "top_p": 0.9,

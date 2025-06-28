@@ -7,7 +7,7 @@ test_cases = [
     ("TC_01_ValidRequest", "A futuristic cityscape with flying cars", 200),
     ("TC_02_LongPrompt", "A " * 5000, 200),
     ("TC_03_SpecialCharacters", "An astronaut riding a horse on Mars! 🚀🐎", 200),
-    ("TC_04_EmptyPrompt", "", 200),
+    ("TC_04_EmptyPrompt", "", 400),
     ("TC_05_InvalidAPIKey", "A beautiful mountain view", 401),
     ("TC_06_NoAPIKey", "A sunset over the ocean", 401),
 ]

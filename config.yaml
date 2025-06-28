@@ -1,8 +1,8 @@
 staging:
-  # base_url: "https://dev-llm-proxy.nebulablock.com/v1/chat/completions"
-  # image_base_url: "https://dev-portal-api.nebulablock.com/api/v1/images/generation"
-  base_url: "https://lite.lag.filezoo.com.cn/v1/chat/completions"
-  image_base_url: "https://portal-api.storefrontiers.cn/api/v1/images/generation"
+  base_url: "https://dev-llm-proxy.nebulablock.com/v1/chat/completions"
+  image_base_url: "https://dev-portal-api.nebulablock.com/api/v1/images/generation"
+  # base_url: "https://lite.lag.filezoo.com.cn/v1/chat/completions"
+  # image_base_url: "https://portal-api.storefrontiers.cn/api/v1/images/generation"
   embedding_base_url: "https://dev-llm-proxy.nebulablock.com/v1/embeddings"
 
 production:
