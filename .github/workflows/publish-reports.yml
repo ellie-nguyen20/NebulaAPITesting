@@ -30,7 +30,7 @@ jobs:
           PERSONAL_REPORT="report_${TIMESTAMP}_personal.html"
           pytest serverless_api/ \
             --html=${PERSONAL_REPORT} \
-            --self-contained-html
+            --self-contained-html || true
           echo "PERSONAL_REPORT=${PERSONAL_REPORT}" >> $GITHUB_ENV
 
       - name: Run tests with TEAM API Key
@@ -41,7 +41,7 @@ jobs:
           TEAM_REPORT="report_${TIMESTAMP}_team.html"
           pytest serverless_api/ \
             --html=${TEAM_REPORT} \
-            --self-contained-html
+            --self-contained-html || true
           echo "TEAM_REPORT=${TEAM_REPORT}" >> $GITHUB_ENV
 
       - name: Checkout gh-pages branch
