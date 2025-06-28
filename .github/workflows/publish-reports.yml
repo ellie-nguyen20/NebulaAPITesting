@@ -24,7 +24,7 @@ jobs:
 
       - name: Run tests with PERSONAL API Key
         env:
-          API_KEY: ${{ secrets.PERSONAL_API_KEY }}
+          API_KEY: ${{ secrets.STAGING_PERSONAL_KEY }}
         run: |
           TIMESTAMP=$(date +'%Y-%m-%d_%H-%M-%S')
           PERSONAL_REPORT="report_${TIMESTAMP}_personal.html"
@@ -35,7 +35,7 @@ jobs:
 
       - name: Run tests with TEAM API Key
         env:
-          API_KEY: ${{ secrets.TEAM_API_KEY }}
+          API_KEY: ${{ secrets.STAGING_TEAM_KEY }}
         run: |
           TIMESTAMP=$(date +'%Y-%m-%d_%H-%M-%S')
           TEAM_REPORT="report_${TIMESTAMP}_team.html"
