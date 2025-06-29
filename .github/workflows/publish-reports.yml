@@ -54,7 +54,7 @@ jobs:
         run: |
           cp $PERSONAL_REPORT gh-pages/
           cp $TEAM_REPORT gh-pages/
-          cp .github/scripts/update_reports.py gh-pages/
+          cp update_reports.py gh-pages/
 
       - name: Update index.html and cleanup old reports
         run: |
