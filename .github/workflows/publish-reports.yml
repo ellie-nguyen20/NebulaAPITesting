@@ -45,6 +45,7 @@ jobs:
           TIMESTAMP=$(date +'%Y-%m-%d_%H-%M-%S')
           TEAM_REPORT="report_${TIMESTAMP}_team.html"
           pytest serverless_api/ \
+            --key $STAGING_TEAM_KEY \
             --html=${TEAM_REPORT} \
             --self-contained-html || true
           echo "TEAM_REPORT=${TEAM_REPORT}" >> $GITHUB_ENV
