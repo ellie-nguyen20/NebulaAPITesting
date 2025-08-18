@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>rpd_test_report.html</title>
+    <style>body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  /* do not increase min-width as some may use split screens */
+  min-width: 800px;
+  color: #999;
+}
+
+h1 {
+  font-size: 24px;
+  color: black;
+}
+
+h2 {
+  font-size: 16px;
+  color: black;
+}
+
+p {
+  color: black;
+}
+
+a {
+  color: #999;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+/******************************
+ * SUMMARY INFORMATION
+ ******************************/
+#environment td {
+  padding: 5px;
+  border: 1px solid #E6E6E6;
+}
+#environment tr:nth-child(odd) {
+  background-color: #f6f6f6;
+}
+
+/******************************
+ * TEST RESULT COLORS
+ ******************************/
+span.passed,
+.passed .col-result {
+  color: green;
+}
+
+span.skipped,
+span.xfailed,
+span.rerun,
+.skipped .col-result,
+.xfailed .col-result,
+.rerun .col-result {
+  color: orange;
+}
+
+span.error,
+span.failed,
+span.xpassed,
+.error .col-result,
+.failed .col-result,
+.xpassed .col-result {
+  color: red;
+}
+
+/******************************
+ * RESULTS TABLE
+ *
+ * 1. Table Layout
+ * 2. Extra
+ * 3. Sorting items
+ *
+ ******************************/
+/*------------------
+ * 1. Table Layout
+ *------------------*/
+#results-table {
+  border: 1px solid #e6e6e6;
+  color: #999;
+  font-size: 12px;
+  width: 100%;
+}
+#results-table th,
+#results-table td {
+  padding: 5px;
+  border: 1px solid #E6E6E6;
+  text-align: left;
+}
+#results-table th {
+  font-weight: bold;
+}
+
+/*------------------
+ * 2. Extra
+ *------------------*/
+.log {
+  background-color: #e6e6e6;
+  border: 1px solid #e6e6e6;
+  color: black;
+  display: block;
+  font-family: "Courier New", Courier, monospace;
+  height: 230px;
+  overflow-y: scroll;
+  padding: 5px;
+  white-space: pre-wrap;
+}
+.log:only-child {
+  height: inherit;
+}
+
+div.image {
+  border: 1px solid #e6e6e6;
+  float: right;
+  height: 240px;
+  margin-left: 5px;
+  overflow: hidden;
+  width: 320px;
+}
+div.image img {
+  width: 320px;
+}
+
+div.video {
+  border: 1px solid #e6e6e6;
+  float: right;
+  height: 240px;
+  margin-left: 5px;
+  overflow: hidden;
+  width: 320px;
+}
+div.video video {
+  overflow: hidden;
+  width: 320px;
+  height: 240px;
+}
+
+.collapsed {
+  display: none;
+}
+
+.expander::after {
+  content: " (show details)";
+  color: #BBB;
+  font-style: italic;
+  cursor: pointer;
+}
+
+.collapser::after {
+  content: " (hide details)";
+  color: #BBB;
+  font-style: italic;
+  cursor: pointer;
+}
+
+/*------------------
+ * 3. Sorting items
+ *------------------*/
+.sortable {
+  cursor: pointer;
+}
+
+.sort-icon {
+  font-size: 0px;
+  float: left;
+  margin-right: 5px;
+  margin-top: 5px;
+  /*triangle*/
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+}
+.inactive .sort-icon {
+  /*finish triangle*/
+  border-top: 8px solid #E6E6E6;
+}
+.asc.active .sort-icon {
+  /*finish triangle*/
+  border-bottom: 8px solid #999;
+}
+.desc.active .sort-icon {
+  /*finish triangle*/
+  border-top: 8px solid #999;
+}
+</style></head>
+  <body onLoad="init()">
+    <script>/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function toArray(iter) {
+    if (iter === null) {
+        return null;
+    }
+    return Array.prototype.slice.call(iter);
+}
+
+function find(selector, elem) { // eslint-disable-line no-redeclare
+    if (!elem) {
+        elem = document;
+    }
+    return elem.querySelector(selector);
+}
+
+function findAll(selector, elem) {
+    if (!elem) {
+        elem = document;
+    }
+    return toArray(elem.querySelectorAll(selector));
+}
+
+function sortColumn(elem) {
+    toggleSortStates(elem);
+    const colIndex = toArray(elem.parentNode.childNodes).indexOf(elem);
+    let key;
+    if (elem.classList.contains('result')) {
+        key = keyResult;
+    } else if (elem.classList.contains('links')) {
+        key = keyLink;
+    } else {
+        key = keyAlpha;
+    }
+    sortTable(elem, key(colIndex));
+}
+
+function showAllExtras() { // eslint-disable-line no-unused-vars
+    findAll('.col-result').forEach(showExtras);
+}
+
+function hideAllExtras() { // eslint-disable-line no-unused-vars
+    findAll('.col-result').forEach(hideExtras);
+}
+
+function showExtras(colresultElem) {
+    const extras = colresultElem.parentNode.nextElementSibling;
+    const expandcollapse = colresultElem.firstElementChild;
+    extras.classList.remove('collapsed');
+    expandcollapse.classList.remove('expander');
+    expandcollapse.classList.add('collapser');
+}
+
+function hideExtras(colresultElem) {
+    const extras = colresultElem.parentNode.nextElementSibling;
+    const expandcollapse = colresultElem.firstElementChild;
+    extras.classList.add('collapsed');
+    expandcollapse.classList.remove('collapser');
+    expandcollapse.classList.add('expander');
+}
+
+function showFilters() {
+    let visibleString = getQueryParameter('visible') || 'all';
+    visibleString = visibleString.toLowerCase();
+    const checkedItems = visibleString.split(',');
+
+    const filterItems = document.getElementsByClassName('filter');
+    for (let i = 0; i < filterItems.length; i++) {
+        filterItems[i].hidden = false;
+
+        if (visibleString != 'all') {
+            filterItems[i].checked = checkedItems.includes(filterItems[i].getAttribute('data-test-result'));
+            filterTable(filterItems[i]);
+        }
+    }
+}
+
+function addCollapse() {
+    // Add links for show/hide all
+    const resulttable = find('table#results-table');
+    const showhideall = document.createElement('p');
+    showhideall.innerHTML = '<a href="javascript:showAllExtras()">Show all details</a> / ' +
+                            '<a href="javascript:hideAllExtras()">Hide all details</a>';
+    resulttable.parentElement.insertBefore(showhideall, resulttable);
+
+    // Add show/hide link to each result
+    findAll('.col-result').forEach(function(elem) {
+        const collapsed = getQueryParameter('collapsed') || 'Passed';
+        const extras = elem.parentNode.nextElementSibling;
+        const expandcollapse = document.createElement('span');
+        if (extras.classList.contains('collapsed')) {
+            expandcollapse.classList.add('expander');
+        } else if (collapsed.includes(elem.innerHTML)) {
+            extras.classList.add('collapsed');
+            expandcollapse.classList.add('expander');
+        } else {
+            expandcollapse.classList.add('collapser');
+        }
+        elem.appendChild(expandcollapse);
+
+        elem.addEventListener('click', function(event) {
+            if (event.currentTarget.parentNode.nextElementSibling.classList.contains('collapsed')) {
+                showExtras(event.currentTarget);
+            } else {
+                hideExtras(event.currentTarget);
+            }
+        });
+    });
+}
+
+function getQueryParameter(name) {
+    const match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+}
+
+function init () { // eslint-disable-line no-unused-vars
+    resetSortHeaders();
+
+    addCollapse();
+
+    showFilters();
+
+    sortColumn(find('.initial-sort'));
+
+    findAll('.sortable').forEach(function(elem) {
+        elem.addEventListener('click',
+            function() {
+                sortColumn(elem);
+            }, false);
+    });
+}
+
+function sortTable(clicked, keyFunc) {
+    const rows = findAll('.results-table-row');
+    const reversed = !clicked.classList.contains('asc');
+    const sortedRows = sort(rows, keyFunc, reversed);
+    /* Whole table is removed here because browsers acts much slower
+     * when appending existing elements.
+     */
+    const thead = document.getElementById('results-table-head');
+    document.getElementById('results-table').remove();
+    const parent = document.createElement('table');
+    parent.id = 'results-table';
+    parent.appendChild(thead);
+    sortedRows.forEach(function(elem) {
+        parent.appendChild(elem);
+    });
+    document.getElementsByTagName('BODY')[0].appendChild(parent);
+}
+
+function sort(items, keyFunc, reversed) {
+    const sortArray = items.map(function(item, i) {
+        return [keyFunc(item), i];
+    });
+
+    sortArray.sort(function(a, b) {
+        const keyA = a[0];
+        const keyB = b[0];
+
+        if (keyA == keyB) return 0;
+
+        if (reversed) {
+            return keyA < keyB ? 1 : -1;
+        } else {
+            return keyA > keyB ? 1 : -1;
+        }
+    });
+
+    return sortArray.map(function(item) {
+        const index = item[1];
+        return items[index];
+    });
+}
+
+function keyAlpha(colIndex) {
+    return function(elem) {
+        return elem.childNodes[1].childNodes[colIndex].firstChild.data.toLowerCase();
+    };
+}
+
+function keyLink(colIndex) {
+    return function(elem) {
+        const dataCell = elem.childNodes[1].childNodes[colIndex].firstChild;
+        return dataCell == null ? '' : dataCell.innerText.toLowerCase();
+    };
+}
+
+function keyResult(colIndex) {
+    return function(elem) {
+        const strings = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed',
+            'Skipped', 'Passed'];
+        return strings.indexOf(elem.childNodes[1].childNodes[colIndex].firstChild.data);
+    };
+}
+
+function resetSortHeaders() {
+    findAll('.sort-icon').forEach(function(elem) {
+        elem.parentNode.removeChild(elem);
+    });
+    findAll('.sortable').forEach(function(elem) {
+        const icon = document.createElement('div');
+        icon.className = 'sort-icon';
+        icon.textContent = 'vvv';
+        elem.insertBefore(icon, elem.firstChild);
+        elem.classList.remove('desc', 'active');
+        elem.classList.add('asc', 'inactive');
+    });
+}
+
+function toggleSortStates(elem) {
+    //if active, toggle between asc and desc
+    if (elem.classList.contains('active')) {
+        elem.classList.toggle('asc');
+        elem.classList.toggle('desc');
+    }
+
+    //if inactive, reset all other functions and add ascending active
+    if (elem.classList.contains('inactive')) {
+        resetSortHeaders();
+        elem.classList.remove('inactive');
+        elem.classList.add('active');
+    }
+}
+
+function isAllRowsHidden(value) {
+    return value.hidden == false;
+}
+
+function filterTable(elem) { // eslint-disable-line no-unused-vars
+    const outcomeAtt = 'data-test-result';
+    const outcome = elem.getAttribute(outcomeAtt);
+    const classOutcome = outcome + ' results-table-row';
+    const outcomeRows = document.getElementsByClassName(classOutcome);
+
+    for(let i = 0; i < outcomeRows.length; i++){
+        outcomeRows[i].hidden = !elem.checked;
+    }
+
+    const rows = findAll('.results-table-row').filter(isAllRowsHidden);
+    const allRowsHidden = rows.length == 0 ? true : false;
+    const notFoundMessage = document.getElementById('not-found-message');
+    notFoundMessage.hidden = !allRowsHidden;
+}
+</script>
+    <h1>rpd_test_report.html</h1>
+    <p>Report generated on 24-Jul-2025 at 12:40:10 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.2.0</p>
+    <h2>Environment</h2>
+    <table id="environment">
+      <tr>
+        <td>Packages</td>
+        <td>{"pluggy": "1.6.0", "pytest": "8.4.1"}</td></tr>
+      <tr>
+        <td>Platform</td>
+        <td>macOS-15.5-arm64-arm-64bit</td></tr>
+      <tr>
+        <td>Plugins</td>
+        <td>{"allure-pytest": "2.13.2", "asyncio": "1.1.0", "html": "3.2.0", "metadata": "2.0.4"}</td></tr>
+      <tr>
+        <td>Python</td>
+        <td>3.9.6</td></tr></table>
+    <h2>Summary</h2>
+    <p>8 tests ran in 2476.35 seconds. </p>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">1 passed</span>, <input checked="true" class="filter" data-test-result="skipped" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">8 skipped</span>, <input checked="true" class="filter" data-test-result="failed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">7 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <h2>Results</h2>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable result initial-sort" col="result">Result</th>
+          <th class="sortable" col="name">Test</th>
+          <th class="sortable" col="duration">Duration</th>
+          <th class="sortable links" col="links">Links</th></tr>
+        <tr hidden="true" id="not-found-message">
+          <th colspan="4">No results found. Try to check the filters</th></tr></thead>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tier1_rpd_limit_combined</td>
+          <td class="col-duration">28.08</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">config = {&#x27;api_key&#x27;: &#x27;sk-RQCC21vmhhiU9tIW53pzHw&#x27;, &#x27;base_url&#x27;: &#x27;https://dev-llm-proxy.nebulablock.com/v1/chat/completions&#x27;, &#x27;emb...bulablock.com/v1/embeddings&#x27;, &#x27;image_base_url&#x27;: &#x27;https://dev-portal-api.nebulablock.com/api/v1/images/generation&#x27;, ...}<br/><br/>    @pytest.mark.asyncio<br/>    async def test_tier1_rpd_limit_combined(config):<br/>        &quot;&quot;&quot;TC: Tier 1 should allow 199 requests, then allow 200th, and block 201st&quot;&quot;&quot;<br/>        tier_config = tier_configs[0]  # Tier 1<br/>        api_key = get_api_key_for_tier(tier_config)<br/>    <br/>        # Step 1: Gửi 199 request đầu tiên<br/>        success_199, rate_limit_199, fail_199, _ = await run_concurrent_requests(<br/>            api_key, config[&#x27;base_url&#x27;], 199<br/>        )<br/>&gt;       assert success_199 == 199, f&quot;Expected 199 successful requests, got {success_199}&quot;<br/><span class="error">E       AssertionError: Expected 199 successful requests, got 30</span><br/><span class="error">E       assert 30 == 199</span><br/><br/>serverless_api/limit_rates/test_request_per_day.py:156: AssertionError<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tc01_tier1_199_requests</td>
+          <td class="col-duration">796.40</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">config = {&#x27;api_key&#x27;: &#x27;sk-RQCC21vmhhiU9tIW53pzHw&#x27;, &#x27;base_url&#x27;: &#x27;https://dev-llm-proxy.nebulablock.com/v1/chat/completions&#x27;, &#x27;emb...bulablock.com/v1/embeddings&#x27;, &#x27;image_base_url&#x27;: &#x27;https://dev-portal-api.nebulablock.com/api/v1/images/generation&#x27;, ...}<br/><br/>    @pytest.mark.asyncio<br/>    async def test_tc01_tier1_199_requests(config):<br/>        &quot;&quot;&quot;TC01: Engineer Tier 1 should handle 199 requests successfully&quot;&quot;&quot;<br/>        tier_config = tier_configs[0]  # Engineer Tier 1<br/>        api_key = get_api_key_for_tier(tier_config)<br/>    <br/>        successful_requests, rate_limited_requests, failed_requests, rate_limited_at = await run_concurrent_requests(<br/>            api_key, config[&#x27;base_url&#x27;], 199, 1, 1.1<br/>        )<br/>    <br/>&gt;       assert successful_requests == 199, f&quot;Should complete 199 requests, got {successful_requests}&quot;<br/><span class="error">E       AssertionError: Should complete 199 requests, got 171</span><br/><span class="error">E       assert 171 == 199</span><br/><br/>serverless_api/limit_rates/test_request_per_day.py:184: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>ERROR    root:test_request_per_day.py:141 Request 120: FAILED (None) - 
+ERROR    root:test_request_per_day.py:141 Request 123: FAILED (None) -<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tier_capabilities[tier_config0]</td>
+          <td class="col-duration">3.68</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">tier_config = {&#x27;cpu&#x27;: False, &#x27;env_var&#x27;: &#x27;ENGINEER_TIER_1&#x27;, &#x27;gpu&#x27;: False, &#x27;requirement&#x27;: &#x27;Sign Up&#x27;, ...}<br/>config = {&#x27;api_key&#x27;: &#x27;sk-RQCC21vmhhiU9tIW53pzHw&#x27;, &#x27;base_url&#x27;: &#x27;https://dev-llm-proxy.nebulablock.com/v1/chat/completions&#x27;, &#x27;emb...bulablock.com/v1/embeddings&#x27;, &#x27;image_base_url&#x27;: &#x27;https://dev-portal-api.nebulablock.com/api/v1/images/generation&#x27;, ...}<br/><br/>    @pytest.mark.asyncio<br/>    @pytest.mark.parametrize(&quot;tier_config&quot;, tier_configs)<br/>    async def test_tier_capabilities(tier_config, config):<br/>        &quot;&quot;&quot;Test that each tier has the correct capabilities (GPU/CPU access)&quot;&quot;&quot;<br/>        tier_name = tier_config[&quot;tier&quot;]<br/>    <br/>        # Get API key for this tier<br/>        api_key = get_api_key_for_tier(tier_config)<br/>    <br/>        # Test basic functionality with DeepSeek R1<br/>        successful_requests, rate_limited_requests, failed_requests, rate_limited_at = await run_concurrent_requests(<br/>            api_key, config[&#x27;base_url&#x27;], 1<br/>        )<br/>    <br/>        assert successful_requests == 1, f&quot;{tier_name}: Basic API call should succeed&quot;<br/>        assert rate_limited_requests == 0, f&quot;{tier_name}: Should not be rate limited for single request&quot;<br/>        assert failed_requests == 0, f&quot;{tier_name}: Should not have failed requests&quot;<br/>    <br/>        logging.info(f&quot;{tier_name}: Basic functionality test PASSED&quot;)<br/>        logging.info(f&quot;  GPU Access: {tier_config[&#x27;gpu&#x27;]}&quot;)<br/>        logging.info(f&quot;  CPU Access: {tier_config[&#x27;cpu&#x27;]}&quot;)<br/>&gt;       logging.info(f&quot;  RPM Limit: {tier_config[&#x27;rpm&#x27;]}&quot;)<br/><span class="error">E       KeyError: &#x27;rpm&#x27;</span><br/><br/>serverless_api/limit_rates/test_request_per_day.py:338: KeyError<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tier_capabilities[tier_config1]</td>
+          <td class="col-duration">1.21</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">tier_config = {&#x27;cpu&#x27;: True, &#x27;env_var&#x27;: &#x27;ENGINEER_TIER_2&#x27;, &#x27;gpu&#x27;: False, &#x27;requirement&#x27;: &#x27;Add Credit Card&#x27;, ...}<br/>config = {&#x27;api_key&#x27;: &#x27;sk-RQCC21vmhhiU9tIW53pzHw&#x27;, &#x27;base_url&#x27;: &#x27;https://dev-llm-proxy.nebulablock.com/v1/chat/completions&#x27;, &#x27;emb...bulablock.com/v1/embeddings&#x27;, &#x27;image_base_url&#x27;: &#x27;https://dev-portal-api.nebulablock.com/api/v1/images/generation&#x27;, ...}<br/><br/>    @pytest.mark.asyncio<br/>    @pytest.mark.parametrize(&quot;tier_config&quot;, tier_configs)<br/>    async def test_tier_capabilities(tier_config, config):<br/>        &quot;&quot;&quot;Test that each tier has the correct capabilities (GPU/CPU access)&quot;&quot;&quot;<br/>        tier_name = tier_config[&quot;tier&quot;]<br/>    <br/>        # Get API key for this tier<br/>        api_key = get_api_key_for_tier(tier_config)<br/>    <br/>        # Test basic functionality with DeepSeek R1<br/>        successful_requests, rate_limited_requests, failed_requests, rate_limited_at = await run_concurrent_requests(<br/>            api_key, config[&#x27;base_url&#x27;], 1<br/>        )<br/>    <br/>&gt;       assert successful_requests == 1, f&quot;{tier_name}: Basic API call should succeed&quot;<br/><span class="error">E       AssertionError: Engineer Tier 2: Basic API call should succeed</span><br/><span class="error">E       assert 0 == 1</span><br/><br/>serverless_api/limit_rates/test_request_per_day.py:331: AssertionError<br/> -------------------------------Captured log call-------------------------------- <br/>ERROR    root:test_request_per_day.py:141 Request 1: FAILED (401) - {&quot;error&quot;:{&quot;message&quot;:&quot;Authentication Error, Invalid proxy server token passed. key=17de51349028de05ad0d611e4b119424ac4dc5b83f2354937808f00ad3f6f19f, not found in db. Create key via `/key/generate` call.&quot;,&quot;type&quot;:&quot;token_not_found_in_db&quot;,&quot;param&quot;:&quot;key&quot;,&quot;code&quot;:&quot;401&quot;}}<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tier_capabilities[tier_config2]</td>
+          <td class="col-duration">3.15</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">tier_config = {&#x27;cpu&#x27;: True, &#x27;env_var&#x27;: &#x27;ENGINEER_TIER_3&#x27;, &#x27;gpu&#x27;: True, &#x27;requirement&#x27;: &#x27;Deposit $10&#x27;, ...}<br/>config = {&#x27;api_key&#x27;: &#x27;sk-RQCC21vmhhiU9tIW53pzHw&#x27;, &#x27;base_url&#x27;: &#x27;https://dev-llm-proxy.nebulablock.com/v1/chat/completions&#x27;, &#x27;emb...bulablock.com/v1/embeddings&#x27;, &#x27;image_base_url&#x27;: &#x27;https://dev-portal-api.nebulablock.com/api/v1/images/generation&#x27;, ...}<br/><br/>    @pytest.mark.asyncio<br/>    @pytest.mark.parametrize(&quot;tier_config&quot;, tier_configs)<br/>    async def test_tier_capabilities(tier_config, config):<br/>        &quot;&quot;&quot;Test that each tier has the correct capabilities (GPU/CPU access)&quot;&quot;&quot;<br/>        tier_name = tier_config[&quot;tier&quot;]<br/>    <br/>        # Get API key for this tier<br/>        api_key = get_api_key_for_tier(tier_config)<br/>    <br/>        # Test basic functionality with DeepSeek R1<br/>        successful_requests, rate_limited_requests, failed_requests, rate_limited_at = await run_concurrent_requests(<br/>            api_key, config[&#x27;base_url&#x27;], 1<br/>        )<br/>    <br/>        assert successful_requests == 1, f&quot;{tier_name}: Basic API call should succeed&quot;<br/>        assert rate_limited_requests == 0, f&quot;{tier_name}: Should not be rate limited for single request&quot;<br/>        assert failed_requests == 0, f&quot;{tier_name}: Should not have failed requests&quot;<br/>    <br/>        logging.info(f&quot;{tier_name}: Basic functionality test PASSED&quot;)<br/>        logging.info(f&quot;  GPU Access: {tier_config[&#x27;gpu&#x27;]}&quot;)<br/>        logging.info(f&quot;  CPU Access: {tier_config[&#x27;cpu&#x27;]}&quot;)<br/>&gt;       logging.info(f&quot;  RPM Limit: {tier_config[&#x27;rpm&#x27;]}&quot;)<br/><span class="error">E       KeyError: &#x27;rpm&#x27;</span><br/><br/>serverless_api/limit_rates/test_request_per_day.py:338: KeyError<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tier_capabilities[tier_config3]</td>
+          <td class="col-duration">3.64</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">tier_config = {&#x27;cpu&#x27;: True, &#x27;env_var&#x27;: &#x27;EXPERT_TIER_1&#x27;, &#x27;gpu&#x27;: True, &#x27;requirement&#x27;: &#x27;Spend $30&#x27;, ...}<br/>config = {&#x27;api_key&#x27;: &#x27;sk-RQCC21vmhhiU9tIW53pzHw&#x27;, &#x27;base_url&#x27;: &#x27;https://dev-llm-proxy.nebulablock.com/v1/chat/completions&#x27;, &#x27;emb...bulablock.com/v1/embeddings&#x27;, &#x27;image_base_url&#x27;: &#x27;https://dev-portal-api.nebulablock.com/api/v1/images/generation&#x27;, ...}<br/><br/>    @pytest.mark.asyncio<br/>    @pytest.mark.parametrize(&quot;tier_config&quot;, tier_configs)<br/>    async def test_tier_capabilities(tier_config, config):<br/>        &quot;&quot;&quot;Test that each tier has the correct capabilities (GPU/CPU access)&quot;&quot;&quot;<br/>        tier_name = tier_config[&quot;tier&quot;]<br/>    <br/>        # Get API key for this tier<br/>        api_key = get_api_key_for_tier(tier_config)<br/>    <br/>        # Test basic functionality with DeepSeek R1<br/>        successful_requests, rate_limited_requests, failed_requests, rate_limited_at = await run_concurrent_requests(<br/>            api_key, config[&#x27;base_url&#x27;], 1<br/>        )<br/>    <br/>        assert successful_requests == 1, f&quot;{tier_name}: Basic API call should succeed&quot;<br/>        assert rate_limited_requests == 0, f&quot;{tier_name}: Should not be rate limited for single request&quot;<br/>        assert failed_requests == 0, f&quot;{tier_name}: Should not have failed requests&quot;<br/>    <br/>        logging.info(f&quot;{tier_name}: Basic functionality test PASSED&quot;)<br/>        logging.info(f&quot;  GPU Access: {tier_config[&#x27;gpu&#x27;]}&quot;)<br/>        logging.info(f&quot;  CPU Access: {tier_config[&#x27;cpu&#x27;]}&quot;)<br/>&gt;       logging.info(f&quot;  RPM Limit: {tier_config[&#x27;rpm&#x27;]}&quot;)<br/><span class="error">E       KeyError: &#x27;rpm&#x27;</span><br/><br/>serverless_api/limit_rates/test_request_per_day.py:338: KeyError<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tier_capabilities[tier_config4]</td>
+          <td class="col-duration">3.27</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">tier_config = {&#x27;cpu&#x27;: True, &#x27;env_var&#x27;: &#x27;EXPERT_TIER_2&#x27;, &#x27;gpu&#x27;: True, &#x27;requirement&#x27;: &#x27;Spend $50&#x27;, ...}<br/>config = {&#x27;api_key&#x27;: &#x27;sk-RQCC21vmhhiU9tIW53pzHw&#x27;, &#x27;base_url&#x27;: &#x27;https://dev-llm-proxy.nebulablock.com/v1/chat/completions&#x27;, &#x27;emb...bulablock.com/v1/embeddings&#x27;, &#x27;image_base_url&#x27;: &#x27;https://dev-portal-api.nebulablock.com/api/v1/images/generation&#x27;, ...}<br/><br/>    @pytest.mark.asyncio<br/>    @pytest.mark.parametrize(&quot;tier_config&quot;, tier_configs)<br/>    async def test_tier_capabilities(tier_config, config):<br/>        &quot;&quot;&quot;Test that each tier has the correct capabilities (GPU/CPU access)&quot;&quot;&quot;<br/>        tier_name = tier_config[&quot;tier&quot;]<br/>    <br/>        # Get API key for this tier<br/>        api_key = get_api_key_for_tier(tier_config)<br/>    <br/>        # Test basic functionality with DeepSeek R1<br/>        successful_requests, rate_limited_requests, failed_requests, rate_limited_at = await run_concurrent_requests(<br/>            api_key, config[&#x27;base_url&#x27;], 1<br/>        )<br/>    <br/>        assert successful_requests == 1, f&quot;{tier_name}: Basic API call should succeed&quot;<br/>        assert rate_limited_requests == 0, f&quot;{tier_name}: Should not be rate limited for single request&quot;<br/>        assert failed_requests == 0, f&quot;{tier_name}: Should not have failed requests&quot;<br/>    <br/>        logging.info(f&quot;{tier_name}: Basic functionality test PASSED&quot;)<br/>        logging.info(f&quot;  GPU Access: {tier_config[&#x27;gpu&#x27;]}&quot;)<br/>        logging.info(f&quot;  CPU Access: {tier_config[&#x27;cpu&#x27;]}&quot;)<br/>&gt;       logging.info(f&quot;  RPM Limit: {tier_config[&#x27;rpm&#x27;]}&quot;)<br/><span class="error">E       KeyError: &#x27;rpm&#x27;</span><br/><br/>serverless_api/limit_rates/test_request_per_day.py:338: KeyError<br/></div></td></tr></tbody>
+      <tbody class="skipped results-table-row">
+        <tr>
+          <td class="col-result">Skipped</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tc02_tier1_200th_request</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">(&#x27;/Users/LENOVO/ellienguyen/nebula-block-sdk-samples/serverless_api/limit_rates/test_request_per_day.py&#x27;, 189, &#x27;Skipped: Skipping individual test cases&#x27;)<br/></div></td></tr></tbody>
+      <tbody class="skipped results-table-row">
+        <tr>
+          <td class="col-result">Skipped</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tc03_tier1_201st_request</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">(&#x27;/Users/LENOVO/ellienguyen/nebula-block-sdk-samples/serverless_api/limit_rates/test_request_per_day.py&#x27;, 205, &#x27;Skipped: Skipping individual test cases&#x27;)<br/></div></td></tr></tbody>
+      <tbody class="skipped results-table-row">
+        <tr>
+          <td class="col-result">Skipped</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tc04_tier2_1000_requests</td>
+          <td class="col-duration">9.75</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">(&#x27;/Users/LENOVO/ellienguyen/nebula-block-sdk-samples/serverless_api/limit_rates/test_request_per_day.py&#x27;, 221, &#x27;Skipped: Skipping individual test cases&#x27;)<br/></div></td></tr></tbody>
+      <tbody class="skipped results-table-row">
+        <tr>
+          <td class="col-result">Skipped</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tc05_tier3_2000_requests</td>
+          <td class="col-duration">9.06</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">(&#x27;/Users/LENOVO/ellienguyen/nebula-block-sdk-samples/serverless_api/limit_rates/test_request_per_day.py&#x27;, 237, &#x27;Skipped: Skipping individual test cases&#x27;)<br/></div></td></tr></tbody>
+      <tbody class="skipped results-table-row">
+        <tr>
+          <td class="col-result">Skipped</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tc06_expert1_999_requests</td>
+          <td class="col-duration">9.71</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">(&#x27;/Users/LENOVO/ellienguyen/nebula-block-sdk-samples/serverless_api/limit_rates/test_request_per_day.py&#x27;, 253, &#x27;Skipped: Skipping individual test cases&#x27;)<br/></div></td></tr></tbody>
+      <tbody class="skipped results-table-row">
+        <tr>
+          <td class="col-result">Skipped</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tc07_expert1_1001_requests</td>
+          <td class="col-duration">9.89</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">(&#x27;/Users/LENOVO/ellienguyen/nebula-block-sdk-samples/serverless_api/limit_rates/test_request_per_day.py&#x27;, 269, &#x27;Skipped: Skipping individual test cases&#x27;)<br/></div></td></tr></tbody>
+      <tbody class="skipped results-table-row">
+        <tr>
+          <td class="col-result">Skipped</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tc08_expert2_2000_requests</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">(&#x27;/Users/LENOVO/ellienguyen/nebula-block-sdk-samples/serverless_api/limit_rates/test_request_per_day.py&#x27;, 285, &#x27;Skipped: Skipping individual test cases&#x27;)<br/></div></td></tr></tbody>
+      <tbody class="skipped results-table-row">
+        <tr>
+          <td class="col-result">Skipped</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tc09_rpd_reset</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">(&#x27;/Users/LENOVO/ellienguyen/nebula-block-sdk-samples/serverless_api/limit_rates/test_request_per_day.py&#x27;, 301, &#x27;Skipped: This test requires manual execution after 24h or system reset&#x27;)<br/></div></td></tr></tbody>
+      <tbody class="passed results-table-row">
+        <tr>
+          <td class="col-result">Passed</td>
+          <td class="col-name">serverless_api/limit_rates/test_request_per_day.py::test_tier_comparison</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="empty log">No log output captured.</div></td></tr></tbody></table></body></html>

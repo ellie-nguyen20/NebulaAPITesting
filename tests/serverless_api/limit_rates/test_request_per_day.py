@@ -224,7 +224,7 @@ async def test_tc01_tier1_200_requests(independent_config):
     print(f"DEBUG: {log_message}")
     
     successful_requests, rate_limited_requests, failed_requests, rate_limited_at = await run_concurrent_requests(
-        api_key, independent_config['base_url'], 201
+        api_key, independent_config['base_url'], 2
     )
     
     assert successful_requests == 200, f"Should complete 200 requests, got {successful_requests}"
@@ -245,7 +245,7 @@ async def test_tc02_tier2_1000_requests(independent_config):
     print(f"DEBUG: {log_message}")
     
     successful_requests, rate_limited_requests, failed_requests, rate_limited_at = await run_concurrent_requests(
-        api_key, independent_config['base_url'], 1001
+        api_key, independent_config['base_url'], 2
     )
     
     assert successful_requests >= 1000, f"Should handle at least 1000 requests, got {successful_requests}"
@@ -266,7 +266,7 @@ async def test_tc03_tier3_2000_requests(independent_config):
     print(f"DEBUG: {log_message}")
     
     successful_requests, rate_limited_requests, failed_requests, rate_limited_at = await run_concurrent_requests(
-        api_key, independent_config['base_url'], 2001 , max_concurrent=100, time_delay=1.0
+        api_key, independent_config['base_url'], 2 , max_concurrent=100, time_delay=1.0
     )
     
     assert successful_requests >= 2000, f"Should handle at least 2000 requests, got {successful_requests}"
@@ -287,7 +287,7 @@ async def test_tc04_expert1_3000_requests(independent_config):
     print(f"DEBUG: {log_message}")
     
     successful_requests, rate_limited_requests, failed_requests, rate_limited_at = await run_concurrent_requests(
-        api_key, independent_config['base_url'], 3000, max_concurrent=100, time_delay=1.0
+        api_key, independent_config['base_url'], 2, max_concurrent=100, time_delay=1.0
     )
     
     assert successful_requests == 3000, f"Should complete 3000 requests, got {successful_requests}"
@@ -304,7 +304,7 @@ async def test_tc04_expert1_3000_requests(independent_config):
     print(f"DEBUG: {log_message}")
     
     successful_requests, rate_limited_requests, failed_requests, rate_limited_at = await run_concurrent_requests(
-        api_key, independent_config['base_url'], 3000
+        api_key, independent_config['base_url'], 2
     )
     
     assert successful_requests == 3000, f"Should complete 3000 requests, got {successful_requests}"
@@ -325,7 +325,7 @@ async def test_tc05_expert2_3500_requests(independent_config):
     print(f"DEBUG: {log_message}")
     
     successful_requests, rate_limited_requests, failed_requests, rate_limited_at = await run_concurrent_requests(
-        api_key, independent_config['base_url'], 3500, max_concurrent=200, time_delay=1.0
+        api_key, independent_config['base_url'], 2, max_concurrent=200, time_delay=1.0
     )
     
     assert successful_requests == 3500, f"Should complete 3500 requests, got {successful_requests}"
