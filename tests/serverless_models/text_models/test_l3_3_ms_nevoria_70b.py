@@ -5,15 +5,15 @@ from api_clients.text_models import TextModelsAPI
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def test_deepseek_v3_0324_free_simple(config_with_api_key):
-    logger.info("🚀 Starting DeepSeek V3-0324 (Free) text test with simple prompt")
+def test_l3_3_ms_nevoria_70b_simple(config_with_api_key):
+    logger.info("🚀 Starting L3.3-MS-Nevoria-70b text test with simple prompt")
     
     try:
         text_api = TextModelsAPI(config_with_api_key)
         logger.info("✅ TextModelsAPI instance created successfully")
         
         response = text_api.call_model(
-            model_name="deepseek-v3-0324-free",
+            model_name="l3.3-ms-nevoria-70b",
             prompt="Is Montreal a thriving hub for the AI industry?",
             system_message="You are a helpful assistant."
         )
@@ -29,13 +29,13 @@ def test_deepseek_v3_0324_free_simple(config_with_api_key):
         assert len(response["choices"]) > 0, "Response should have at least one choice"
         
         content = response["choices"][0]["message"]["content"]
-        logger.info(f"📝 DeepSeek V3-0324 (Free) text response: {content}")
+        logger.info(f"📝 L3.3-MS-Nevoria-70b text response: {content}")
         
         assert len(content) > 0, "Response content should not be empty"
         assert isinstance(content, str), "Response content should be a string"
         
-        logger.info("✅ DeepSeek V3-0324 (Free) text test completed successfully")
+        logger.info("✅ L3.3-MS-Nevoria-70b text test completed successfully")
         
     except Exception as e:
-        logger.error(f"❌ DeepSeek V3-0324 (Free) text test failed: {e}")
+        logger.error(f"❌ L3.3-MS-Nevoria-70b text test failed: {e}")
         raise
