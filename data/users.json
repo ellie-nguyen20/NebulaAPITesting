@@ -36,11 +36,12 @@
     },
     "Member7": {
       "email": "thivunguyen1506+member7@gmail.com",
-      "password": "456456"
+      "password": "456456",
+      "tier": "eng tier3"
     },
     "Member8": {
       "email": "thivunguyen1506+member8@gmail.com",
       "password": "456456",
-      "tier": "eng tier1"
+      "tier": "eng tier2"
     }
   }

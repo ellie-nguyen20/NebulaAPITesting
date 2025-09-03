@@ -6,9 +6,7 @@ import pytest
 import requests
 import json
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
+# No longer using .env file - authentication is done through account login
 
 def load_users_from_json():
     """Load user credentials from data/users.json"""

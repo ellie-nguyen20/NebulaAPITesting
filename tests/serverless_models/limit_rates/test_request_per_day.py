@@ -5,10 +5,7 @@ import logging
 import time
 import os
 import yaml
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
+# No longer using .env file - authentication is done through account login
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

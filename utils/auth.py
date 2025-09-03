@@ -7,10 +7,7 @@ import os
 import yaml
 import requests
 from typing import Dict, Any, Optional
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
+# No longer using .env file - authentication is done through account login
 
 class NebulaAuth:
     """Authentication class for Nebula Block API - Focused on API key management"""

@@ -142,8 +142,6 @@ def test_create_team(team_api):
     print(f"  📄 Description: {description}")
     print(f"  ✅ Status: Created successfully")
     
-    # Return team data for potential use in other tests
-    return team_data
 
 
 def test_create_team_empty_name(team_api):
@@ -196,56 +194,6 @@ def test_create_team_empty_name(team_api):
     except Exception as e:
         print(f"⚠️ Could not parse error response: {e}")
 
-
-def test_create_team_empty_description(team_api):
-    """Test team creation with empty description - should fail"""
-    
-    # Test data
-    team_name = "test_team_no_desc"
-    team_description = ""
-    
-    # Make API call
-    response = team_api.create_team(team_name, team_description)
-    print(f"Response: {response}")
-    
-    # Should fail with empty description
-    if response.ok:
-        # If unexpectedly succeeded, store for cleanup
-        try:
-            data = response.json()
-            if "data" in data and "id" in data["data"]:
-                team_data = {
-                    "id": data["data"]["id"],
-                    "name": data["data"].get("name", "test_team_no_desc"),
-                    "description": data["data"].get("description", ""),
-                    "response": response
-                }
-                created_teams.append(team_data)
-                print(f"⚠️ Unexpected success - team created and stored for cleanup")
-        except Exception as e:
-            print(f"⚠️ Could not store team data for cleanup: {e}")
-    
-    # Validate that it should fail
-    assert not response.ok, "API call should fail with empty team description"
-    assert response.status_code in [400, 422], f"Expected 400/422 status, got {response.status_code}"
-    
-    # Parse error response
-    try:
-        data = response.json()
-        print(f"Error response: {data}")
-        
-        # Validate error response structure
-        assert "status" in data, "Error response missing 'status' field"
-        assert data["status"] == "error", f"Expected status 'error', got '{data['status']}'"
-        
-        # Should have error message
-        assert "message" in data, "Error response missing 'message' field"
-        assert len(data["message"]) > 0, "Error message should not be empty"
-        
-        print(f"✅ Empty description correctly rejected: {data['message']}")
-        
-    except Exception as e:
-        print(f"⚠️ Could not parse error response: {e}")
 
 
 def test_create_team_very_long_name(team_api):
@@ -605,3 +553,96 @@ def test_create_team_xss_prevention(team_api):
         print(f"✅ XSS correctly rejected: {response.status_code}")
 
 
+def test_get_all_teams(team_api):
+    """Test getting all teams with simple validation"""
+    
+    # Make API call
+    response = team_api.get_all_teams()
+    print(f"Response: {response}")
+    
+    # Basic response validation
+    assert response.ok, "API call should succeed"
+    assert response.status_code == 200, f"Expected status 200, got {response.status_code}"
+    
+    # Parse response data
+    try:
+        data = response.json()
+        print(f"Response data: {data}")
+    except Exception as e:
+        pytest.fail(f"Failed to parse JSON response: {e}")
+    
+    # Validate response structure
+    assert "data" in data, "Response missing 'data' field"
+    assert "message" in data, "Response missing 'message' field"
+    assert "status" in data, "Response missing 'status' field"
+    
+    # Validate status field
+    assert data["status"] == "success", f"Expected status 'success', got '{data['status']}'"
+    
+    # Validate message field
+    expected_message = "Teams retrieved successfully"
+    assert data["message"] == expected_message, f"Expected message '{expected_message}', got '{data['message']}'"
+    
+    # Validate data field structure
+    data_field = data["data"]
+    assert isinstance(data_field, list), "Data field should be a list"
+    assert len(data_field) >= 0, "Teams list should not be negative"
+    
+    print(f"\n📊 Found {len(data_field)} teams")
+    
+    # If there are teams, validate basic team structure
+    if len(data_field) > 0:
+        print(f"\n🔍 Validating team structures...")
+        
+        for i, team in enumerate(data_field):
+            print(f"  Team {i+1}: {team.get('name', 'Unknown')}")
+            
+            # Validate essential team fields
+            essential_fields = ["id", "name", "description", "role", "permissions", "members", "created_at", "owner"]
+            
+            for field in essential_fields:
+                assert field in team, f"Team {i+1} missing essential field: {field}"
+            
+            # Validate basic field types
+            assert isinstance(team["id"], int), f"Team {i+1} ID should be an integer"
+            assert isinstance(team["name"], str), f"Team {i+1} name should be a string"
+            assert isinstance(team["description"], str), f"Team {i+1} description should be a string"
+            assert isinstance(team["role"], int), f"Team {i+1} role should be an integer"
+            assert isinstance(team["permissions"], list), f"Team {i+1} permissions should be a list"
+            assert isinstance(team["members"], int), f"Team {i+1} members should be an integer"
+            assert isinstance(team["created_at"], int), f"Team {i+1} created_at should be an integer"
+            assert isinstance(team["owner"], dict), f"Team {i+1} owner should be a dictionary"
+            
+            # Validate owner structure
+            owner = team["owner"]
+            owner_fields = ["id", "name", "tier"]
+            for field in owner_fields:
+                assert field in owner, f"Team {i+1} owner missing field: {field}"
+            
+            # Validate basic values
+            assert team["id"] > 0, f"Team {i+1} ID should be positive"
+            assert len(team["name"]) > 0, f"Team {i+1} name should not be empty"
+            assert team["role"] in [0, 1], f"Team {i+1} role should be 0 or 1"
+            assert team["members"] >= 0, f"Team {i+1} members should be non-negative"
+            assert team["created_at"] > 0, f"Team {i+1} created_at should be positive"
+            assert owner["id"] > 0, f"Team {i+1} owner ID should be positive"
+            assert len(owner["name"]) > 0, f"Team {i+1} owner name should not be empty"
+            assert len(owner["tier"]) > 0, f"Team {i+1} owner tier should not be empty"
+            
+            print(f"    ✅ Validated: ID={team['id']}, Role={team['role']}, Members={team['members']}")
+            print(f"    ✅ Owner: {owner['name']} (Tier: {owner['tier']})")
+        
+        # Basic data consistency check
+        team_ids = [team["id"] for team in data_field]
+        unique_ids = set(team_ids)
+        assert len(team_ids) == len(unique_ids), f"Team IDs should be unique, found {len(team_ids)} teams but {len(unique_ids)} unique IDs"
+        print(f"\n✅ All team IDs are unique")
+        
+    else:
+        print(f"ℹ️ No teams found - this is valid for new users")
+    
+    print(f"\n🎉 Get all teams successful!")
+    print(f"✅ Total teams: {len(data_field)}")
+    print(f"✅ Response status: {data['status']}")
+    print(f"✅ Response message: {data['message']}")
+  

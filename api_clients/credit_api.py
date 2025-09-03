@@ -109,3 +109,9 @@ class CreditsAPI(BaseAPIClient):
         """Delete Stripe payment method."""
         payload = {"payment_method_id": payment_method_id}
         return self.post("/payment/delete", data=payload)
+
+    # Set up Payment Method
+    def set_up_payment_method(self, payment_method_id):
+        """Set up payment method."""
+        payload = {"payment_method_id": payment_method_id}
+        return self.post("/payment/setup_payment_method", data=payload)

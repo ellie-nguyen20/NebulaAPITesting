@@ -1,4 +1,4 @@
-staging:
+# # staging:
   # Clean base URLs without endpoints
   base_url: "https://dev-portal-api.nebulablock.com/api/v1"
   model_base_url: "https://dev-llm-proxy.nebulablock.com/v1"
@@ -8,12 +8,12 @@ staging:
   image_generation_url: "https://dev-portal-api.nebulablock.com/api/v1/images/generation"
   embedding_url: "https://dev-llm-proxy.nebulablock.com/v1/embeddings"
 
-production:
+# production:
   # Clean base URLs without endpoints
-  base_url: "https://api.nebulablock.com/api/v1"
-  model_base_url: "https://inference.nebulablock.com/v1"
+  # base_url: "https://api.nebulablock.com/api/v1"
+  # model_base_url: "https://inference.nebulablock.com/v1"
   
   # Full endpoint URLs (for backward compatibility)
-  chat_completions_url: "https://inference.nebulablock.com/v1/chat/completions"
-  image_generation_url: "https://api.nebulablock.com/api/v1/images/generation"
-  embedding_url: "https://inference.nebulablock.com/v1/embeddings"
+  # chat_completions_url: "https://inference.nebulablock.com/v1/chat/completions"
+  # image_generation_url: "https://api.nebulablock.com/api/v1/images/generation"
+  # embedding_url: "https://inference.nebulablock.com/v1/embeddings"
