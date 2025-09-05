@@ -5,16 +5,19 @@
       "tier": "exp tier2"
     },
     "Alice": {
-      "email": "alice.nguyen@helixmesh.com",
-      "password": "123123"
+      "email": "ellie.nguyen@helixmesh.com",
+      "password": "123123",
+      "tier": "exp tier2"
     },
     "Member1": {
       "email": "thivunguyen1506+member1@gmail.com",
-      "password": "456456"
+      "password": "456456",
+      "tier": "exp tier2"
     },
     "Member2": {
       "email": "thivunguyen1506+member2@gmail.com",
-      "password": "456456"
+      "password": "456456",
+      "tier": "exp tier2"
     },
     "Member3": {
       "email": "thivunguyen1506+member3@gmail.com",
@@ -24,15 +27,17 @@
     "Member4": {
       "email": "thivunguyen1506+member4@gmail.com",
       "password": "456456",
-      "tier": "eng tier3"
+      "tier": "exp tier1"
     },
     "Member5": {
       "email": "thivunguyen1506+member5@gmail.com",
-      "password": "456456"
+      "password": "456456",
+      "tier": "eng tier3"
     },
     "Member6": {
       "email": "thivunguyen1506+member6@gmail.com",
-      "password": "456456"
+      "password": "456456",
+      "tier": "eng tier1"
     },
     "Member7": {
       "email": "thivunguyen1506+member7@gmail.com",
@@ -43,5 +48,10 @@
       "email": "thivunguyen1506+member8@gmail.com",
       "password": "456456",
       "tier": "eng tier2"
+    },
+    "Member9": {
+      "email": "thivunguyen1506+member9@gmail.com",
+      "password": "456456",
+      "tier": "eng tier1"
     }
   }

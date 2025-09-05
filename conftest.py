@@ -406,3 +406,82 @@ def api_key_scope_module(config, auth_token):
     except Exception as e:
         logger.error(f"Error getting personal API key: {e}")
         raise Exception(f"Failed to get personal API key: {e}")
+
+@pytest.fixture
+def login_as_user(config):
+    """
+    Login as a specific user and return their config with API key.
+    
+    This fixture allows individual test cases to select which user to login as.
+    Usage: user_config = login_as_user("Member9")
+    
+    Args:
+        config: Base configuration from conftest.py
+        
+    Returns:
+        Function that takes user_id and returns user config with API key
+    """
+    def _login_as_user(user_id: str) -> dict:
+        """
+        Login as specific user and return their config.
+        
+        Args:
+            user_id: User ID from data/users.json (e.g., "Member9", "Ellie")
+            
+        Returns:
+            User configuration dictionary with API key
+        """
+        from utils.auth import login_user
+        
+        logger.info(f"🔐 Logging in as user: {user_id}")
+        
+        try:
+            # Login user and get JWT token
+            auth_token = login_user(user_id)
+            logger.info(f"✅ Successfully logged in as {user_id}")
+            
+            # Get API key for this user
+            from api_clients.api_key import APIKeyAPI
+            api_key_client = APIKeyAPI(config["base_url"], api_key=auth_token)
+            
+            # Get all API keys for the current user
+            response = api_key_client.get_api_keys()
+            
+            if not response.ok:
+                logger.error(f"Failed to get API keys: {response.status_code} - {response.text}")
+                raise Exception(f"Failed to get API keys: {response.status_code}")
+            
+            api_keys_data = response.json()
+            
+            if api_keys_data.get("status") != "success":
+                logger.error(f"API keys response not successful: {api_keys_data}")
+                raise Exception(f"API keys response not successful: {api_keys_data.get('message', 'Unknown error')}")
+            
+            api_keys = api_keys_data.get("data", [])
+            
+            if not api_keys:
+                logger.error("No API keys found for user")
+                raise Exception("No API keys found for user")
+            
+            logger.info(f"Found {len(api_keys)} API keys for user")
+            
+            # Find personal key (team: null)
+            personal_key = _find_personal_api_key(api_keys)
+            
+            if not personal_key:
+                logger.error("No personal API key found (team: null). Test will be stopped.")
+                raise Exception("No personal API key found (team: null). Test will be stopped.")
+            
+            logger.info(f"Found personal API key: {personal_key['name'] or 'Unnamed'} (ID: {personal_key['id']})")
+            
+            # Combine base config with user's API key
+            user_config = config.copy()
+            user_config["api_key"] = personal_key["key"]
+            
+            return user_config
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to login as {user_id}: {e}")
+            raise Exception(f"Failed to login as {user_id}: {e}")
+    
+    return _login_as_user

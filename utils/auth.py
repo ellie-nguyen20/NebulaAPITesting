@@ -164,4 +164,54 @@ def list_available_environments() -> list:
             config = yaml.safe_load(file)
         return list(config.keys())
     except Exception:
-        return [] 
+        return []
+
+def login_user(user_id: str) -> str:
+    """
+    Login user and return JWT token.
+    
+    Args:
+        user_id: User ID from data/users.json (e.g., "Member9", "Ellie")
+        
+    Returns:
+        JWT token string
+        
+    Raises:
+        Exception: If login fails
+    """
+    import json
+    from pathlib import Path
+    
+    # Load users from JSON
+    users_file = Path(__file__).parent.parent / "data" / "users.json"
+    with open(users_file, "r", encoding="utf-8") as f:
+        users = json.load(f)
+    
+    if user_id not in users:
+        raise Exception(f"User '{user_id}' not found in users.json")
+    
+    user_data = users[user_id]
+    
+    # Load config
+    config_file = Path(__file__).parent.parent / "config.yaml"
+    with open(config_file, "r") as f:
+        config = yaml.safe_load(f)
+    
+    base_url = config["base_url"]
+    
+    # Login request
+    payload = {
+        "username": user_data["email"],
+        "password": user_data["password"]
+    }
+    
+    response = requests.post(f"{base_url}/login", data=payload, timeout=10)
+    
+    if response.status_code == 200:
+        response_data = response.json()
+        if "data" in response_data and "jwtToken" in response_data["data"]:
+            return response_data["data"]["jwtToken"]
+        else:
+            raise Exception(f"Login response missing jwtToken: {response.text}")
+    else:
+        raise Exception(f"Login failed: {response.status_code} - {response.text}") 
