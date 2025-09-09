@@ -156,7 +156,8 @@ def test_expert_tier2_can_use_all_deepseek_free(login_as_user):
         assert isinstance(content, str), f"Response content should be a string for {model}"
 
 def test_tier_hierarchy_access_control(login_as_user):
-    """Test tier hierarchy: Engineer Tier 1 blocked, others allowed."""
+    """Test tier hierarchy: Engineer Tier 1 blocked, all others allowed."""
+    
     # Test Engineer Tier 1 (should be blocked)
     try:
         user_config = login_as_user("Member9")
@@ -170,18 +171,7 @@ def test_tier_hierarchy_access_control(login_as_user):
     except Exception:
         pass  # Expected to fail
     
-    # Test Engineer Tier 2 (should be allowed)
-    user_config = login_as_user("Member8")
-    text_api = TextModelsAPI(user_config)
-    response = text_api.call_model(
-        model_name="deepseek-r1-free",
-        prompt="Hello",
-        system_message="You are a helpful assistant."
-    )
-    assert response is not None, "Engineer Tier 2 should be allowed"
-
-def test_all_high_tier_users_can_access_deepseek_free(login_as_user):
-    """Test that all high tier users can access DeepSeek Free models."""
+    # Test all high tier users (should be allowed)
     high_tier_users = ["Member8", "Member7", "Member4", "Ellie"]
     
     for user in high_tier_users:

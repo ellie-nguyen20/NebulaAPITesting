@@ -188,10 +188,10 @@ def api_key_scope_session(config, auth_token):
         api_keys = api_keys_data.get("data", [])
         
         if not api_keys:
-            logger.error("No API keys found for user")
-            raise Exception("No API keys found for user")
+            logger.error("No API keys found for team")
+            raise Exception("No API keys found for team")
         
-        logger.info(f"Found {len(api_keys)} API keys for user")
+        logger.info(f"Found {len(api_keys)} API keys for team")
         
         # Find personal key (team: null)
         personal_key = _find_personal_api_key(api_keys)
@@ -460,10 +460,10 @@ def login_as_user(config):
             api_keys = api_keys_data.get("data", [])
             
             if not api_keys:
-                logger.error("No API keys found for user")
-                raise Exception("No API keys found for user")
+                logger.error("No API keys found for team")
+                raise Exception("No API keys found for team")
             
-            logger.info(f"Found {len(api_keys)} API keys for user")
+            logger.info(f"Found {len(api_keys)} API keys for team")
             
             # Find personal key (team: null)
             personal_key = _find_personal_api_key(api_keys)
