@@ -8,6 +8,7 @@ from api_clients.credit_api import CreditsAPI
 from api_clients.ssh_key import SSHKeyAPI
 from api_clients.embedding_api import EmbeddingAPI
 from api_clients.rerank_api import RerankAPI
+from api_clients.vision_api import VisionAPI
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -500,7 +501,7 @@ def login_as_user(config):
     return _login_as_user
 
 @pytest.fixture(scope="session")
-def embedding_api(config, auth_token):
+def embedding_api(config, api_key_scope_session):
     """
     Global EmbeddingAPI client for entire test session.
     
@@ -509,12 +510,12 @@ def embedding_api(config, auth_token):
     """
     embedding_config = {
         "embedding_url": config["embedding_url"],
-        "api_key": auth_token
+        "api_key": api_key_scope_session
     }
     return EmbeddingAPI(embedding_config)
 
 @pytest.fixture(scope="session")
-def rerank_api(config, auth_token):
+def rerank_api(config, api_key_scope_session):
     """
     Global RerankAPI client for entire test session.
     
@@ -523,6 +524,20 @@ def rerank_api(config, auth_token):
     """
     rerank_config = {
         "rerank_url": config["rerank_url"],
-        "api_key": auth_token
+        "api_key": api_key_scope_session
     }
     return RerankAPI(rerank_config)
+
+@pytest.fixture(scope="session")
+def vision_api(config, api_key_scope_session):
+    """
+    Global VisionAPI client for entire test session.
+    
+    Returns:
+        VisionAPI client instance
+    """
+    vision_config = {
+        "chat_completions_url": config["chat_completions_url"],
+        "api_key": api_key_scope_session
+    }
+    return VisionAPI(vision_config)

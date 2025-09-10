@@ -5,11 +5,15 @@ from api_clients.text_models import TextModelsAPI
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def test_deepseek_r1_0528_paid_simple(config_with_api_key):
+def test_deepseek_r1_0528_paid_simple(config, api_key_scope_session):
     logger.info("🚀 Starting DeepSeek R1-0528 (Paid) text test with simple prompt")
     
     try:
-        text_api = TextModelsAPI(config_with_api_key)
+        text_config = {
+            "chat_completions_url": config["chat_completions_url"],
+            "api_key": api_key_scope_session
+        }
+        text_api = TextModelsAPI(text_config)
         logger.info("✅ TextModelsAPI instance created successfully")
         
         response = text_api.call_model(

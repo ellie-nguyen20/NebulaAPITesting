@@ -5,11 +5,15 @@ from api_clients.multimodal_models import MultimodalModelsAPI
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def test_gemini_2_5_flash_lite_simple(config_with_api_key):
+def test_gemini_2_5_flash_lite_simple(config, api_key_scope_session):
     logger.info("🚀 Starting Gemini 2.5 Flash Lite test with simple prompt")
     
     try:
-        multimodal_api = MultimodalModelsAPI(config_with_api_key)
+        multimodal_config = {
+            "chat_completions_url": config["chat_completions_url"],
+            "api_key": api_key_scope_session
+        }
+        multimodal_api = MultimodalModelsAPI(multimodal_config)
         logger.info("✅ MultimodalModelsAPI instance created successfully")
         
         response = multimodal_api.call_model(

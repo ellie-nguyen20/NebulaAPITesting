@@ -6,11 +6,15 @@ from api_clients.multimodal_models import MultimodalModelsAPI
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def test_new_claude_sonnet4(config_with_api_key):
+def test_new_claude_sonnet4(config, api_key_scope_session):
     logger.info("🚀 Starting Claude Sonnet 4 test with simple prompt")
     
     try:
-        multimodal_api = MultimodalModelsAPI(config_with_api_key)
+        multimodal_config = {
+            "chat_completions_url": config["chat_completions_url"],
+            "api_key": api_key_scope_session
+        }
+        multimodal_api = MultimodalModelsAPI(multimodal_config)
         logger.info("✅ MultimodalModelsAPI instance created successfully")
         
         response = multimodal_api.call_model(
