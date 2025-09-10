@@ -3,17 +3,17 @@ from .base_api import BaseAPIClient
 class SSHKeyAPI(BaseAPIClient):
     """SSH Key API client for managing SSH key operations."""
 
-    def create_ssh_key(self, name: str, public_key: str):
+    def create_ssh_key(self, name: str, public_key: str, description: str = ""):
         """Create a new SSH key."""
         payload = {
-            "name": name,
-            "public_key": public_key
+            "key_name": name,
+            "key_data": public_key
         }
-        return self.post("/ssh-keys/", data=payload)
+        return self.post("/ssh-keys", data=payload)
     
     def get_ssh_keys(self):
         """Get all SSH keys."""
-        return self.get("/ssh-keys/")
+        return self.get("/ssh-keys")
     
     def rename_ssh_key(self, ssh_key_id: str, name: str):
         """Rename an SSH key."""

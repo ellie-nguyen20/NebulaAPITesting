@@ -7,6 +7,7 @@
   chat_completions_url: "https://dev-llm-proxy.nebulablock.com/v1/chat/completions"
   image_generation_url: "https://dev-portal-api.nebulablock.com/api/v1/images/generation"
   embedding_url: "https://dev-llm-proxy.nebulablock.com/v1/embeddings"
+  rerank_url: "https://dev-llm-proxy.nebulablock.com/v1/rerank"
 
 # production:
   # Clean base URLs without endpoints

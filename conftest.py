@@ -6,6 +6,8 @@ import logging
 from pathlib import Path
 from api_clients.credit_api import CreditsAPI
 from api_clients.ssh_key import SSHKeyAPI
+from api_clients.embedding_api import EmbeddingAPI
+from api_clients.rerank_api import RerankAPI
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -496,3 +498,31 @@ def login_as_user(config):
             raise Exception(f"Failed to login as {user_id}: {e}")
     
     return _login_as_user
+
+@pytest.fixture(scope="session")
+def embedding_api(config, auth_token):
+    """
+    Global EmbeddingAPI client for entire test session.
+    
+    Returns:
+        EmbeddingAPI client instance
+    """
+    embedding_config = {
+        "embedding_url": config["embedding_url"],
+        "api_key": auth_token
+    }
+    return EmbeddingAPI(embedding_config)
+
+@pytest.fixture(scope="session")
+def rerank_api(config, auth_token):
+    """
+    Global RerankAPI client for entire test session.
+    
+    Returns:
+        RerankAPI client instance
+    """
+    rerank_config = {
+        "rerank_url": config["rerank_url"],
+        "api_key": auth_token
+    }
+    return RerankAPI(rerank_config)

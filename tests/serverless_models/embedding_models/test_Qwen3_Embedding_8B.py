@@ -6,8 +6,8 @@ import time
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def test_uae_large_v1_embedding_basic(config, api_key_scope_session):
-    """Test UAE-Large-V1 embedding model - Basic functionality"""
+def test_qwen3_embedding_8b_basic(config, api_key_scope_session):
+    """Test Qwen3-Embedding-8B model - Basic functionality"""
     
     # Initialize embedding API
     embedding_config = {
@@ -22,11 +22,11 @@ def test_uae_large_v1_embedding_basic(config, api_key_scope_session):
         "The Eiffel Tower in Paris was originally intended to be a temporary structure."
     ]
     
-    print(f"\nTesting UAE-Large-V1 embedding model...")
+    print(f"\nTesting Qwen3-Embedding-8B model...")
     print(f"  Input texts: {len(test_texts)} texts")
     
     # Create embeddings
-    response = embedding_api.create_embeddings("uae-large-v1", test_texts)
+    response = embedding_api.create_embeddings("qwen3-embedding-8b", test_texts)
     
     # Validate response
     assert response.ok, f"Embedding creation failed with status {response.status_code}"
@@ -64,7 +64,7 @@ def test_uae_large_v1_embedding_basic(config, api_key_scope_session):
             assert isinstance(value, (int, float)), f"Embedding {i} value {j} should be a number"
     
     # Validate model field
-    assert data["model"] == "WhereIsAI/UAE-Large-V1", f"Expected model 'WhereIsAI/UAE-Large-V1', got '{data['model']}'"
+    assert data["model"] == "Qwen/Qwen3-Embedding-8B", f"Expected model 'Qwen/Qwen3-Embedding-8B', got '{data['model']}'"
     
     # Validate usage field
     usage = data["usage"]
@@ -76,10 +76,10 @@ def test_uae_large_v1_embedding_basic(config, api_key_scope_session):
     print(f"  Embeddings count: {len(embeddings_data)}")
     print(f"  Embedding dimensions: {len(embeddings_data[0]['embedding'])}")
     print(f"  Usage: {usage}")
-    print(f"  UAE-Large-V1 embedding test completed successfully!")
+    print(f"  Qwen3-Embedding-8B test completed successfully!")
 
-def test_uae_large_v1_single_text(config, api_key_scope_session):
-    """Test UAE-Large-V1 with single text input"""
+def test_qwen3_embedding_8b_single_text(config, api_key_scope_session):
+    """Test Qwen3-Embedding-8B with single text input"""
     
     # Initialize embedding API
     embedding_config = {
@@ -89,13 +89,13 @@ def test_uae_large_v1_single_text(config, api_key_scope_session):
     embedding_api = EmbeddingAPI(embedding_config)
     
     # Single text
-    test_text = "This is a single text for embedding."
+    test_text = "This is a single text for Qwen3 embedding."
     
-    print(f"\nTesting UAE-Large-V1 with single text...")
+    print(f"\nTesting Qwen3-Embedding-8B with single text...")
     print(f"  Text: {test_text}")
     
     # Create embedding
-    response = embedding_api.create_embeddings("uae-large-v1", test_text)
+    response = embedding_api.create_embeddings("qwen3-embedding-8b", test_text)
     
     # Validate response
     assert response.ok, f"Single text embedding failed with status {response.status_code}"
@@ -111,8 +111,8 @@ def test_uae_large_v1_single_text(config, api_key_scope_session):
     print(f"  Single text embedding successful!")
     print(f"  Dimensions: {len(embeddings_data[0]['embedding'])}")
 
-def test_uae_large_v1_dimensions(config, api_key_scope_session):
-    """Test UAE-Large-V1 embedding dimensions"""
+def test_qwen3_embedding_8b_dimensions(config, api_key_scope_session):
+    """Test Qwen3-Embedding-8B embedding dimensions"""
     
     # Initialize embedding API
     embedding_config = {
@@ -121,10 +121,10 @@ def test_uae_large_v1_dimensions(config, api_key_scope_session):
     }
     embedding_api = EmbeddingAPI(embedding_config)
     
-    print(f"\nTesting UAE-Large-V1 dimensions...")
+    print(f"\nTesting Qwen3-Embedding-8B dimensions...")
     
     # Get dimensions
-    dimensions = embedding_api.get_embedding_dimensions("uae-large-v1", "test text")
+    dimensions = embedding_api.get_embedding_dimensions("qwen3-embedding-8b", "test text")
     
     assert dimensions is not None, "Failed to get dimensions"
     assert dimensions > 0, "Dimensions should be positive"
@@ -132,8 +132,8 @@ def test_uae_large_v1_dimensions(config, api_key_scope_session):
     print(f"  Embedding dimensions: {dimensions}")
     print(f"  Dimensions test completed successfully!")
 
-def test_uae_large_v1_performance(config, api_key_scope_session):
-    """Test UAE-Large-V1 performance with multiple texts"""
+def test_qwen3_embedding_8b_performance(config, api_key_scope_session):
+    """Test Qwen3-Embedding-8B performance with multiple texts"""
     
     # Initialize embedding API
     embedding_config = {
@@ -144,17 +144,17 @@ def test_uae_large_v1_performance(config, api_key_scope_session):
     
     # Create multiple test texts
     test_texts = [
-        f"Performance test text number {i} for UAE-Large-V1 model." 
+        f"Performance test text number {i} for Qwen3-Embedding-8B model." 
         for i in range(10)
     ]
     
-    print(f"\nTesting UAE-Large-V1 performance...")
+    print(f"\nTesting Qwen3-Embedding-8B performance...")
     print(f"  Texts count: {len(test_texts)}")
     
     start_time = time.time()
     
     # Create embeddings
-    response = embedding_api.create_embeddings("uae-large-v1", test_texts)
+    response = embedding_api.create_embeddings("qwen3-embedding-8b", test_texts)
     
     end_time = time.time()
     duration = end_time - start_time
@@ -170,3 +170,85 @@ def test_uae_large_v1_performance(config, api_key_scope_session):
     print(f"  Processing time: {duration:.2f} seconds")
     print(f"  Texts per second: {len(test_texts) / duration:.2f}")
     print(f"  Performance test completed successfully!")
+
+def test_qwen3_embedding_8b_batch_processing(config, api_key_scope_session):
+    """Test Qwen3-Embedding-8B batch processing"""
+    
+    # Initialize embedding API
+    embedding_config = {
+        "embedding_url": config["embedding_url"],
+        "api_key": api_key_scope_session
+    }
+    embedding_api = EmbeddingAPI(embedding_config)
+    
+    # Create a batch of test texts
+    test_texts = [
+        f"Batch test text number {i} for Qwen3-Embedding-8B model." 
+        for i in range(15)
+    ]
+    
+    print(f"\nTesting Qwen3-Embedding-8B batch processing...")
+    print(f"  Batch size: {len(test_texts)} texts")
+    
+    # Process batch
+    responses = embedding_api.batch_embeddings("qwen3-embedding-8b", test_texts, batch_size=5)
+    
+    assert len(responses) > 0, "Should have at least one batch response"
+    
+    total_embeddings = 0
+    for i, response in enumerate(responses):
+        assert response.ok, f"Batch {i} failed with status {response.status_code}"
+        
+        data = response.json()
+        embeddings = data["data"]
+        total_embeddings += len(embeddings)
+        
+        print(f"    Batch {i+1}: {len(embeddings)} embeddings")
+    
+    assert total_embeddings == len(test_texts), f"Expected {len(test_texts)} total embeddings, got {total_embeddings}"
+    
+    print(f"  Total embeddings processed: {total_embeddings}")
+    print(f"  Batch processing test completed successfully!")
+
+def test_qwen3_embedding_8b_multilingual(config, api_key_scope_session):
+    """Test Qwen3-Embedding-8B with multilingual text"""
+    
+    # Initialize embedding API
+    embedding_config = {
+        "embedding_url": config["embedding_url"],
+        "api_key": api_key_scope_session
+    }
+    embedding_api = EmbeddingAPI(embedding_config)
+    
+    # Multilingual test texts
+    test_texts = [
+        "Hello, how are you today?",  # English
+        "Bonjour, comment allez-vous?",  # French
+        "Hola, ¿cómo estás?",  # Spanish
+        "你好，你今天怎么样？",  # Chinese
+        "こんにちは、元気ですか？"  # Japanese
+    ]
+    
+    print(f"\nTesting Qwen3-Embedding-8B multilingual...")
+    print(f"  Languages: English, French, Spanish, Chinese, Japanese")
+    print(f"  Texts count: {len(test_texts)}")
+    
+    # Create embeddings
+    response = embedding_api.create_embeddings("qwen3-embedding-8b", test_texts)
+    
+    # Validate response
+    assert response.ok, f"Multilingual test failed with status {response.status_code}"
+    
+    data = response.json()
+    embeddings_data = data["data"]
+    
+    assert len(embeddings_data) == len(test_texts), f"Expected {len(test_texts)} embeddings, got {len(embeddings_data)}"
+    
+    # Check that all embeddings have the same dimensions
+    dimensions = len(embeddings_data[0]["embedding"])
+    for i, embedding_item in enumerate(embeddings_data):
+        assert len(embedding_item["embedding"]) == dimensions, f"Embedding {i} has different dimensions"
+    
+    print(f"  Multilingual embeddings generated successfully!")
+    print(f"  Embedding dimensions: {dimensions}")
+    print(f"  Multilingual test completed successfully!")
