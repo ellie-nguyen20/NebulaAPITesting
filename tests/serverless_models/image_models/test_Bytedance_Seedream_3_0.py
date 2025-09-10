@@ -5,9 +5,9 @@ from api_clients.image_api import ImageAPI
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def test_flux_1_schnell_basic(config, api_key_scope_session):
-    """Test FLUX.1 [schnell] model - Basic functionality"""
-    logger.info("🚀 Starting FLUX.1 [schnell] image test with basic prompt")
+def test_bytedance_seedream_3_0_basic(config, api_key_scope_session):
+    """Test Bytedance-Seedream-3.0 model - Basic functionality"""
+    logger.info("🚀 Starting Bytedance-Seedream-3.0 image test with basic prompt")
     
     try:
         # Initialize image API
@@ -19,13 +19,13 @@ def test_flux_1_schnell_basic(config, api_key_scope_session):
         logger.info("✅ ImageAPI instance created successfully")
         
         # Test data
-        prompt = "An astronaut riding a horse on Mars"
+        prompt = "A futuristic cityscape with flying cars and neon lights"
         
-        print(f"\nTesting FLUX.1 [schnell] model...")
+        print(f"\nTesting Bytedance-Seedream-3.0 model...")
         print(f" Prompt: {prompt}")
         
         # Generate image
-        response = image_api.generate_image("flux-1-schnell", prompt)
+        response = image_api.generate_image("bytedance-seedream-3.0", prompt)
         
         # Validate response
         assert response.ok, f"Image generation failed with status {response.status_code}"
@@ -49,16 +49,16 @@ def test_flux_1_schnell_basic(config, api_key_scope_session):
         assert isinstance(image_data["b64_json"], str), "'b64_json' should be a string"
         assert len(image_data["b64_json"]) > 0, "'b64_json' should not be empty"
         
-        print(f"✅ FLUX.1 [schnell] test completed successfully")
+        print(f"✅ Bytedance-Seedream-3.0 test completed successfully")
         print(f" Generated image size: {len(image_data['b64_json'])} characters")
         
     except Exception as e:
-        logger.error(f"❌ FLUX.1 [schnell] test failed: {e}")
+        logger.error(f"❌ Bytedance-Seedream-3.0 test failed: {e}")
         raise
 
-def test_flux_1_schnell_with_style(config, api_key_scope_session):
-    """Test FLUX.1 [schnell] model with cartoon style"""
-    logger.info("🚀 Starting FLUX.1 [schnell] image test with cartoon style")
+def test_bytedance_seedream_3_0_with_style(config, api_key_scope_session):
+    """Test Bytedance-Seedream-3.0 model with artistic style"""
+    logger.info("🚀 Starting Bytedance-Seedream-3.0 image test with artistic style")
     
     try:
         # Initialize image API
@@ -69,14 +69,14 @@ def test_flux_1_schnell_with_style(config, api_key_scope_session):
         image_api = ImageAPI(image_config)
         
         # Test data
-        prompt = "A cute cat playing with a ball of yarn"
-        style = "cartoon"
+        prompt = "A majestic dragon soaring through clouds"
+        style = "artistic"
         
-        print(f"\nTesting FLUX.1 [schnell] with {style} style...")
+        print(f"\nTesting Bytedance-Seedream-3.0 with {style} style...")
         print(f" Prompt: {prompt}")
         
         # Generate image with style
-        response = image_api.generate_image_with_style("flux-1-schnell", prompt, style=style)
+        response = image_api.generate_image_with_style("bytedance-seedream-3.0", prompt, style=style)
         
         # Validate response
         assert response.ok, f"Image generation failed with status {response.status_code}"
@@ -92,16 +92,16 @@ def test_flux_1_schnell_with_style(config, api_key_scope_session):
         assert "b64_json" in image_data, "Missing 'b64_json' in image data"
         assert len(image_data["b64_json"]) > 0, "'b64_json' should not be empty"
         
-        print(f"✅ FLUX.1 [schnell] {style} style test completed successfully")
+        print(f"✅ Bytedance-Seedream-3.0 {style} style test completed successfully")
         print(f" Generated image size: {len(image_data['b64_json'])} characters")
         
     except Exception as e:
-        logger.error(f"❌ FLUX.1 [schnell] {style} style test failed: {e}")
+        logger.error(f"❌ Bytedance-Seedream-3.0 {style} style test failed: {e}")
         raise
 
-def test_flux_1_schnell_multiple_images(config, api_key_scope_session):
-    """Test FLUX.1 [schnell] model generating multiple images"""
-    logger.info("🚀 Starting FLUX.1 [schnell] multiple images test")
+def test_bytedance_seedream_3_0_multiple_images(config, api_key_scope_session):
+    """Test Bytedance-Seedream-3.0 model generating multiple images"""
+    logger.info("🚀 Starting Bytedance-Seedream-3.0 multiple images test")
     
     try:
         # Initialize image API
@@ -112,15 +112,15 @@ def test_flux_1_schnell_multiple_images(config, api_key_scope_session):
         image_api = ImageAPI(image_config)
         
         # Test data
-        prompt = "A cyberpunk city with neon lights and rain"
-        num_images = 3
+        prompt = "A beautiful sunset over the ocean"
+        num_images = 2
         
-        print(f"\nTesting FLUX.1 [schnell] multiple images...")
+        print(f"\nTesting Bytedance-Seedream-3.0 multiple images...")
         print(f" Prompt: {prompt}")
         print(f" Number of images: {num_images}")
         
         # Generate multiple images
-        response = image_api.generate_multiple_images("flux-1-schnell", prompt, num_images=num_images)
+        response = image_api.generate_multiple_images("bytedance-seedream-3.0", prompt, num_images=num_images)
         
         # Validate response
         assert response.ok, f"Image generation failed with status {response.status_code}"
@@ -138,8 +138,8 @@ def test_flux_1_schnell_multiple_images(config, api_key_scope_session):
             assert len(image_data["b64_json"]) > 0, f"'b64_json' should not be empty in image {i+1}"
             print(f" Image {i+1} size: {len(image_data['b64_json'])} characters")
         
-        print(f"✅ FLUX.1 [schnell] multiple images test completed successfully")
+        print(f"✅ Bytedance-Seedream-3.0 multiple images test completed successfully")
         
     except Exception as e:
-        logger.error(f"❌ FLUX.1 [schnell] multiple images test failed: {e}")
+        logger.error(f"❌ Bytedance-Seedream-3.0 multiple images test failed: {e}")
         raise

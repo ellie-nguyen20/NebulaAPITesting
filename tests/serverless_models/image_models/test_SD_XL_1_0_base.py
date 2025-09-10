@@ -5,9 +5,9 @@ from api_clients.image_api import ImageAPI
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def test_flux_1_schnell_basic(config, api_key_scope_session):
-    """Test FLUX.1 [schnell] model - Basic functionality"""
-    logger.info("🚀 Starting FLUX.1 [schnell] image test with basic prompt")
+def test_sd_xl_1_0_base_basic(config, api_key_scope_session):
+    """Test SD-XL 1.0-base model - Basic functionality"""
+    logger.info("🚀 Starting SD-XL 1.0-base image test with basic prompt")
     
     try:
         # Initialize image API
@@ -19,13 +19,13 @@ def test_flux_1_schnell_basic(config, api_key_scope_session):
         logger.info("✅ ImageAPI instance created successfully")
         
         # Test data
-        prompt = "An astronaut riding a horse on Mars"
+        prompt = "A beautiful mountain landscape at sunset"
         
-        print(f"\nTesting FLUX.1 [schnell] model...")
+        print(f"\nTesting SD-XL 1.0-base model...")
         print(f" Prompt: {prompt}")
         
         # Generate image
-        response = image_api.generate_image("flux-1-schnell", prompt)
+        response = image_api.generate_image("sd-xl-1.0-base", prompt)
         
         # Validate response
         assert response.ok, f"Image generation failed with status {response.status_code}"
@@ -49,16 +49,16 @@ def test_flux_1_schnell_basic(config, api_key_scope_session):
         assert isinstance(image_data["b64_json"], str), "'b64_json' should be a string"
         assert len(image_data["b64_json"]) > 0, "'b64_json' should not be empty"
         
-        print(f"✅ FLUX.1 [schnell] test completed successfully")
+        print(f"✅ SD-XL 1.0-base test completed successfully")
         print(f" Generated image size: {len(image_data['b64_json'])} characters")
         
     except Exception as e:
-        logger.error(f"❌ FLUX.1 [schnell] test failed: {e}")
+        logger.error(f"❌ SD-XL 1.0-base test failed: {e}")
         raise
 
-def test_flux_1_schnell_with_style(config, api_key_scope_session):
-    """Test FLUX.1 [schnell] model with cartoon style"""
-    logger.info("🚀 Starting FLUX.1 [schnell] image test with cartoon style")
+def test_sd_xl_1_0_base_with_style(config, api_key_scope_session):
+    """Test SD-XL 1.0-base model with realistic style"""
+    logger.info("🚀 Starting SD-XL 1.0-base image test with realistic style")
     
     try:
         # Initialize image API
@@ -69,14 +69,14 @@ def test_flux_1_schnell_with_style(config, api_key_scope_session):
         image_api = ImageAPI(image_config)
         
         # Test data
-        prompt = "A cute cat playing with a ball of yarn"
-        style = "cartoon"
+        prompt = "A professional portrait of a business person"
+        style = "realistic"
         
-        print(f"\nTesting FLUX.1 [schnell] with {style} style...")
+        print(f"\nTesting SD-XL 1.0-base with {style} style...")
         print(f" Prompt: {prompt}")
         
         # Generate image with style
-        response = image_api.generate_image_with_style("flux-1-schnell", prompt, style=style)
+        response = image_api.generate_image_with_style("sd-xl-1.0-base", prompt, style=style)
         
         # Validate response
         assert response.ok, f"Image generation failed with status {response.status_code}"
@@ -92,16 +92,16 @@ def test_flux_1_schnell_with_style(config, api_key_scope_session):
         assert "b64_json" in image_data, "Missing 'b64_json' in image data"
         assert len(image_data["b64_json"]) > 0, "'b64_json' should not be empty"
         
-        print(f"✅ FLUX.1 [schnell] {style} style test completed successfully")
+        print(f"✅ SD-XL 1.0-base {style} style test completed successfully")
         print(f" Generated image size: {len(image_data['b64_json'])} characters")
         
     except Exception as e:
-        logger.error(f"❌ FLUX.1 [schnell] {style} style test failed: {e}")
+        logger.error(f"❌ SD-XL 1.0-base {style} style test failed: {e}")
         raise
 
-def test_flux_1_schnell_multiple_images(config, api_key_scope_session):
-    """Test FLUX.1 [schnell] model generating multiple images"""
-    logger.info("🚀 Starting FLUX.1 [schnell] multiple images test")
+def test_sd_xl_1_0_base_with_dimensions(config, api_key_scope_session):
+    """Test SD-XL 1.0-base model with specific dimensions"""
+    logger.info("🚀 Starting SD-XL 1.0-base image test with specific dimensions")
     
     try:
         # Initialize image API
@@ -112,15 +112,14 @@ def test_flux_1_schnell_multiple_images(config, api_key_scope_session):
         image_api = ImageAPI(image_config)
         
         # Test data
-        prompt = "A cyberpunk city with neon lights and rain"
-        num_images = 3
+        prompt = "A futuristic robot in a laboratory"
+        width, height = 1024, 768
         
-        print(f"\nTesting FLUX.1 [schnell] multiple images...")
+        print(f"\nTesting SD-XL 1.0-base with dimensions {width}x{height}...")
         print(f" Prompt: {prompt}")
-        print(f" Number of images: {num_images}")
         
-        # Generate multiple images
-        response = image_api.generate_multiple_images("flux-1-schnell", prompt, num_images=num_images)
+        # Generate image with specific dimensions
+        response = image_api.generate_image_with_dimensions("sd-xl-1.0-base", prompt, width=width, height=height)
         
         # Validate response
         assert response.ok, f"Image generation failed with status {response.status_code}"
@@ -129,17 +128,16 @@ def test_flux_1_schnell_multiple_images(config, api_key_scope_session):
         # Parse response data
         data = response.json()
         assert "data" in data, "Response missing 'data' field"
-        assert isinstance(data["data"], list), "'data' is not a list"
-        assert len(data["data"]) == num_images, f"Expected {num_images} images, got {len(data['data'])}"
+        assert len(data["data"]) > 0, "'data' is empty"
         
-        # Validate each image
-        for i, image_data in enumerate(data["data"]):
-            assert "b64_json" in image_data, f"Missing 'b64_json' in image {i+1}"
-            assert len(image_data["b64_json"]) > 0, f"'b64_json' should not be empty in image {i+1}"
-            print(f" Image {i+1} size: {len(image_data['b64_json'])} characters")
+        # Validate image data
+        image_data = data["data"][0]
+        assert "b64_json" in image_data, "Missing 'b64_json' in image data"
+        assert len(image_data["b64_json"]) > 0, "'b64_json' should not be empty"
         
-        print(f"✅ FLUX.1 [schnell] multiple images test completed successfully")
+        print(f"✅ SD-XL 1.0-base dimensions {width}x{height} test completed successfully")
+        print(f" Generated image size: {len(image_data['b64_json'])} characters")
         
     except Exception as e:
-        logger.error(f"❌ FLUX.1 [schnell] multiple images test failed: {e}")
+        logger.error(f"❌ SD-XL 1.0-base dimensions test failed: {e}")
         raise

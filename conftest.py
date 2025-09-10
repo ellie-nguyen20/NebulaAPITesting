@@ -9,6 +9,7 @@ from api_clients.ssh_key import SSHKeyAPI
 from api_clients.embedding_api import EmbeddingAPI
 from api_clients.rerank_api import RerankAPI
 from api_clients.vision_api import VisionAPI
+from api_clients.image_api import ImageAPI
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -541,3 +542,17 @@ def vision_api(config, api_key_scope_session):
         "api_key": api_key_scope_session
     }
     return VisionAPI(vision_config)
+
+@pytest.fixture(scope="session")
+def image_api(config, api_key_scope_session):
+    """
+    Global ImageAPI client for entire test session.
+    
+    Returns:
+        ImageAPI client instance
+    """
+    image_config = {
+        "image_generation_url": config["image_generation_url"],
+        "api_key": api_key_scope_session
+    }
+    return ImageAPI(image_config)
