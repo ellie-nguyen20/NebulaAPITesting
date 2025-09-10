@@ -5,6 +5,7 @@ import requests
 import logging
 from pathlib import Path
 from api_clients.credit_api import CreditsAPI
+from api_clients.ssh_key import SSHKeyAPI
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -348,6 +349,16 @@ def api_key_api(config, auth_token):
     """
     from api_clients.api_key import APIKeyAPI
     return APIKeyAPI(config["base_url"], api_key=auth_token)
+
+@pytest.fixture(scope="session")
+def ssh_key_api(config, auth_token):
+    """
+    Global SSHKeyAPI client for entire test session.
+    
+    Returns:
+        SSHKeyAPI client instance
+    """
+    return SSHKeyAPI(config["base_url"], api_key=auth_token)
 
 @pytest.fixture(scope="module")
 def api_key_scope_module(config, auth_token):

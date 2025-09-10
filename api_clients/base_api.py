@@ -68,6 +68,9 @@ class BaseAPIClient:
         
         try:
             self.logger.debug(f"Making {method} request to {url}")
+            self.logger.debug(f"Request headers: {request_headers}")
+            self.logger.debug(f"Request data: {data}")
+            self.logger.debug(f"Request params: {params}")
             
             response = self.session.request(
                 method=method,
@@ -77,6 +80,10 @@ class BaseAPIClient:
                 headers=request_headers,
                 timeout=self.timeout
             )
+            
+            self.logger.debug(f"Response status: {response.status_code}")
+            self.logger.debug(f"Response headers: {dict(response.headers)}")
+            self.logger.debug(f"Response text: {response.text[:500]}...")  # First 500 chars
             
             response.raise_for_status()
             return response
