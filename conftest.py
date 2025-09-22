@@ -10,6 +10,7 @@ from api_clients.embedding_api import EmbeddingAPI
 from api_clients.rerank_api import RerankAPI
 from api_clients.vision_api import VisionAPI
 from api_clients.image_api import ImageAPI
+from api_clients.video_api import VideoAPI
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -556,3 +557,17 @@ def image_api(config, api_key_scope_session):
         "api_key": api_key_scope_session
     }
     return ImageAPI(image_config)
+
+@pytest.fixture(scope="session")
+def video_api(config, api_key_scope_session):
+    """
+    Global VideoAPI client for entire test session.
+    
+    Returns:
+        VideoAPI client instance
+    """
+    video_config = {
+        "video_generation_url": config["video_generation_url"],
+        "api_key": api_key_scope_session
+    }
+    return VideoAPI(video_config)

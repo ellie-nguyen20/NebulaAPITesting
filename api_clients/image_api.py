@@ -38,22 +38,6 @@ class ImageAPI(BaseModel):
                 "seed": -1,
                 "guidance_scale": 2.5
             },
-            "sd-xl-1.0-base": {
-                "model": "stabilityai/stable-diffusion-xl-base-1.0",
-                "width": 1024,
-                "height": 1024,
-                "num_steps": 25,
-                "guidance_scale": 9,
-                "negative_prompt": None
-            },
-            "flux-1-schnell": {
-                "model": "black-forest-labs/FLUX.1-schnell",
-                "width": 1024,
-                "height": 1024,
-                "num_steps": 4,
-                "guidance_scale": 3.5,
-                "seed": -1
-            },
             "flux-1-kontext-dev": {
                 "model": "black-forest-labs/FLUX.1-Kontext-dev",
                 "width": 1024,

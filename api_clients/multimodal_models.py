@@ -23,13 +23,6 @@ class MultimodalModelsAPI(BaseModel):
         
         # Predefined model configurations
         self.model_configs = {
-            "claude-sonnet-4": {
-                "model": "anthropic/claude-sonnet-4-20250514",
-                "max_tokens": None,
-                "temperature": 1,
-                "top_p": 0.9,
-                "stream": False
-            },
             "gpt-4o-mini": {
                 "model": "openai/gpt-4o-mini",
                 "max_tokens": None,

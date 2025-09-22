@@ -6,6 +6,7 @@
   # Full endpoint URLs (for backward compatibility)
   chat_completions_url: "https://dev-llm-proxy.nebulablock.com/v1/chat/completions"
   image_generation_url: "https://dev-portal-api.nebulablock.com/api/v1/images/generation"
+  video_generation_url: "https://dev-portal-api.nebulablock.com/api/v1/videos/generation"
   embedding_url: "https://dev-llm-proxy.nebulablock.com/v1/embeddings"
   rerank_url: "https://dev-llm-proxy.nebulablock.com/v1/rerank"
 

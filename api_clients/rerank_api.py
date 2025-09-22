@@ -34,14 +34,6 @@ class RerankAPI(BaseModel):
             "bge-reranker-v2-m3": {
                 "model": "BAAI/bge-reranker-v2-m3",
                 "top_n": 3
-            },
-            "bge-reranker-base": {
-                "model": "BAAI/bge-reranker-base",
-                "top_n": 3
-            },
-            "bge-reranker-large": {
-                "model": "BAAI/bge-reranker-large",
-                "top_n": 3
             }
         }
     

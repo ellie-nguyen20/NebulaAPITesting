@@ -48,92 +48,6 @@ def test_bytedance_seedream_3_0_basic(config, api_key_scope_session):
     print(f"✅ Bytedance-Seedream-3.0 test completed successfully")
     print(f" Generated image size: {len(image_data['b64_json'])} characters")
 
-def test_sd_xl_1_0_base_basic(config, api_key_scope_session):
-    """Test SD-XL 1.0-base model - Basic functionality"""
-    # Initialize image API
-    image_config = {
-        "image_generation_url": config["image_generation_url"],
-        "api_key": api_key_scope_session
-    }
-    image_api = ImageAPI(image_config)
-    
-    # Test data
-    prompt = "A beautiful mountain landscape at sunset"
-    
-    print(f"\nTesting SD-XL 1.0-base model...")
-    print(f" Prompt: {prompt}")
-    
-    # Generate image
-    response = image_api.generate_image("sd-xl-1.0-base", prompt)
-    
-    # Validate response
-    assert response.ok, f"Image generation failed with status {response.status_code}"
-    assert response.status_code == 200, f"Expected status 200, got {response.status_code}"
-    
-    # Parse response data
-    try:
-        data = response.json()
-        print(f" Response data keys: {list(data.keys())}")
-    except Exception as e:
-        pytest.fail(f"Failed to parse JSON response: {e}")
-    
-    # Validate response structure
-    assert "data" in data, "Response missing 'data' field"
-    assert isinstance(data["data"], list), "'data' is not a list"
-    assert len(data["data"]) > 0, "'data' is empty"
-    
-    # Validate image data
-    image_data = data["data"][0]
-    assert "b64_json" in image_data, "Missing 'b64_json' in image data"
-    assert isinstance(image_data["b64_json"], str), "'b64_json' should be a string"
-    assert len(image_data["b64_json"]) > 0, "'b64_json' should not be empty"
-    
-    print(f"✅ SD-XL 1.0-base test completed successfully")
-    print(f" Generated image size: {len(image_data['b64_json'])} characters")
-
-def test_flux_1_schnell_basic(config, api_key_scope_session):
-    """Test FLUX.1 [schnell] model - Basic functionality"""
-    # Initialize image API
-    image_config = {
-        "image_generation_url": config["image_generation_url"],
-        "api_key": api_key_scope_session
-    }
-    image_api = ImageAPI(image_config)
-    
-    # Test data
-    prompt = "An astronaut riding a horse on Mars"
-    
-    print(f"\nTesting FLUX.1 [schnell] model...")
-    print(f" Prompt: {prompt}")
-    
-    # Generate image
-    response = image_api.generate_image("flux-1-schnell", prompt)
-    
-    # Validate response
-    assert response.ok, f"Image generation failed with status {response.status_code}"
-    assert response.status_code == 200, f"Expected status 200, got {response.status_code}"
-    
-    # Parse response data
-    try:
-        data = response.json()
-        print(f" Response data keys: {list(data.keys())}")
-    except Exception as e:
-        pytest.fail(f"Failed to parse JSON response: {e}")
-    
-    # Validate response structure
-    assert "data" in data, "Response missing 'data' field"
-    assert isinstance(data["data"], list), "'data' is not a list"
-    assert len(data["data"]) > 0, "'data' is empty"
-    
-    # Validate image data
-    image_data = data["data"][0]
-    assert "b64_json" in image_data, "Missing 'b64_json' in image data"
-    assert isinstance(image_data["b64_json"], str), "'b64_json' should be a string"
-    assert len(image_data["b64_json"]) > 0, "'b64_json' should not be empty"
-    
-    print(f"✅ FLUX.1 [schnell] test completed successfully")
-    print(f" Generated image size: {len(image_data['b64_json'])} characters")
-
 def test_flux_1_kontext_dev_basic(config, api_key_scope_session):
     """Test FLUX.1 [Kontext-dev] model - Basic functionality"""
     # Initialize image API
@@ -199,7 +113,7 @@ def test_image_generation_with_style(config, api_key_scope_session):
         print(f" Testing style: {style}")
         
         # Generate image with style
-        response = image_api.generate_image_with_style("flux-1-schnell", base_prompt, style=style)
+        response = image_api.generate_image_with_style("bytedance-seedream-3.0", base_prompt, style=style)
         
         # Validate response
         assert response.ok, f"Image generation failed with status {response.status_code}"
@@ -232,7 +146,7 @@ def test_image_generation_multiple_images(config, api_key_scope_session):
     print(f" Number of images: {num_images}")
     
     # Generate multiple images
-    response = image_api.generate_multiple_images("flux-1-schnell", prompt, num_images=num_images)
+    response = image_api.generate_multiple_images("bytedance-seedream-3.0", prompt, num_images=num_images)
     
     # Validate response
     assert response.ok, f"Image generation failed with status {response.status_code}"
@@ -273,7 +187,7 @@ def test_image_generation_with_dimensions(config, api_key_scope_session):
         print(f" Testing dimensions: {width}x{height}")
         
         # Generate image with specific dimensions
-        response = image_api.generate_image_with_dimensions("flux-1-schnell", prompt, width=width, height=height)
+        response = image_api.generate_image_with_dimensions("bytedance-seedream-3.0", prompt, width=width, height=height)
         
         # Validate response
         assert response.ok, f"Image generation failed with status {response.status_code}"

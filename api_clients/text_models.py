@@ -101,15 +101,15 @@ class TextModelsAPI(BaseModel):
                 "top_p": 0.9,
                 "stream": False
             },
-            "llama-3.3-70b": {
-                "model": "meta-llama/Llama-3.3-70B-Instruct",
+            "qwq-32b": {
+                "model": "Qwen/QwQ-32B",
                 "max_tokens": None,
                 "temperature": 1,
                 "top_p": 0.9,
                 "stream": False
             },
-            "qwq-32b": {
-                "model": "Qwen/QwQ-32B",
+            "saul-7b-instruct-v1": {
+                "model": "Equall/Saul-7B-Instruct-v1",
                 "max_tokens": None,
                 "temperature": 1,
                 "top_p": 0.9,
@@ -128,7 +128,7 @@ class TextModelsAPI(BaseModel):
         Call text model with text prompt only.
         
         Args:
-            model_name: Model identifier (e.g., 'gpt-4o-mini', 'claude-sonnet-4')
+            model_name: Model identifier (e.g., 'gpt-4o-mini', 'saul-7b-instruct-v1')
             prompt: Text prompt
             system_message: Optional system message
             **kwargs: Override default model parameters

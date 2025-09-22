@@ -58,5 +58,15 @@
       "email": "thivunguyen1506+member10@gmail.com",
       "password": "456456",
       "tier": "eng tier1"
+    },
+    "Member11": {
+      "email": "thivunguyen1506+member11@gmail.com",
+      "password": "456456",
+      "tier": "eng tier1"
+    },
+    "Member12": {
+      "email": "thivunguyen1506+member12@gmail.com",
+      "password": "456456",
+      "tier": "expert tier2"
     }
   }
