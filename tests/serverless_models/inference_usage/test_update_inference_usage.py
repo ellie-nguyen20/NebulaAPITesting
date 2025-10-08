@@ -16,7 +16,7 @@ def get_llm_statistics(base_url: str, auth_token: str, time_frame: str = "1d"):
     Args:
         base_url: Base URL for the API
         auth_token: JWT token for authentication
-        time_frame: Time frame for statistics (e.g., "1d", "7d")
+        time_frame: Time frame for statistics (supported: "1h", "1d")
         
     Returns:
         API response dictionary
@@ -40,24 +40,26 @@ def get_llm_statistics(base_url: str, auth_token: str, time_frame: str = "1d"):
         return None
 
 
-def test_inference_usage_update_timing(config, auth_token, api_key_scope_session):
+def test_inference_usage_update_timing_1d(config, auth_token, api_key_scope_session):
     """
     Test to determine how long it takes for the system to update inference usage statistics.
     
+    This test uses 1-day time frame (7 days actual data) to verify statistics tracking.
+    
     This test:
-    1. Gets initial usage statistics
+    1. Gets initial usage statistics (1d timeframe)
     2. Makes a request to DeepSeek R1 Free model
     3. Polls the statistics API every 30 seconds to see when usage is updated
     4. Reports the time it takes for usage to be reflected in statistics
     """
-    logger.info("🚀 Starting inference usage update timing test")
+    logger.info("🚀 Starting inference usage update timing test (1-day timeframe)")
     logger.info("=" * 80)
     
     base_url = config["base_url"]
     
     try:
         # Step 1: Get initial statistics
-        logger.info("\n📊 Step 1: Getting initial statistics...")
+        logger.info("\n📊 Step 1: Getting initial statistics (1d timeframe)...")
         initial_stats = get_llm_statistics(base_url, auth_token, time_frame="1d")
         
         assert initial_stats is not None, "Failed to get initial statistics"
@@ -76,7 +78,7 @@ def test_inference_usage_update_timing(config, auth_token, api_key_scope_session
         else:
             pytest.fail(f"Unexpected response type: {type(initial_stats)}")
         
-        logger.info(f"✅ Initial statistics retrieved:")
+        logger.info(f"✅ Initial statistics retrieved (1d):")
         logger.info(f"   - Total requests: {initial_total_requests}")
         logger.info(f"   - Total tokens: {initial_total_tokens}")
         
@@ -109,7 +111,7 @@ def test_inference_usage_update_timing(config, auth_token, api_key_scope_session
         logger.info(f"   - Response preview: {response['choices'][0]['message']['content'][:100]}...")
         
         # Step 3: Poll statistics API to see when usage updates
-        logger.info("\n⏳ Step 3: Polling statistics API to detect usage update...")
+        logger.info("\n⏳ Step 3: Polling statistics API (1d) to detect usage update...")
         logger.info("   (Checking every 30 seconds, max 10 minutes)")
         
         max_attempts = 20  # 20 attempts * 30 seconds = 10 minutes max
@@ -140,7 +142,7 @@ def test_inference_usage_update_timing(config, auth_token, api_key_scope_session
                     update_detected_at = datetime.now()
                     time_to_update = (update_detected_at - request_time).total_seconds()
                     
-                    logger.info(f"\n🎉 Usage update detected!")
+                    logger.info(f"\n🎉 Usage update detected in 1d statistics!")
                     logger.info(f"   ✅ Request made at: {request_time.strftime('%H:%M:%S')}")
                     logger.info(f"   ✅ Update detected at: {update_detected_at.strftime('%H:%M:%S')}")
                     logger.info(f"   ✅ Time to update: {time_to_update:.0f} seconds ({time_to_update/60:.1f} minutes)")
@@ -154,13 +156,13 @@ def test_inference_usage_update_timing(config, auth_token, api_key_scope_session
         logger.info("\n" + "=" * 80)
         if usage_updated:
             time_to_update = (update_detected_at - request_time).total_seconds()
-            logger.info(f"✅ TEST RESULT: Inference usage is updated within ~{time_to_update/60:.1f} minutes")
+            logger.info(f"✅ TEST RESULT (1d): Inference usage is updated within ~{time_to_update/60:.1f} minutes")
             logger.info(f"   (Exact time: {time_to_update:.0f} seconds)")
             
             # Assert that usage was updated (test passes)
             assert usage_updated, "Usage should be updated"
         else:
-            logger.error(f"❌ TEST RESULT: Usage was NOT updated within {max_attempts * poll_interval / 60:.0f} minutes")
+            logger.error(f"❌ TEST RESULT (1d): Usage was NOT updated within {max_attempts * poll_interval / 60:.0f} minutes")
             logger.error("   This might indicate:")
             logger.error("   1. Statistics update delay is longer than expected")
             logger.error("   2. There might be an issue with the statistics tracking system")
@@ -176,27 +178,27 @@ def test_inference_usage_update_timing(config, auth_token, api_key_scope_session
         raise
 
 
-def test_inference_usage_update_timing_7d(config, auth_token, api_key_scope_session):
+def test_inference_usage_update_timing_1h(config, auth_token, api_key_scope_session):
     """
     Test to determine how long it takes for the system to update inference usage statistics.
     
-    This test uses 7-day time frame to verify statistics tracking over a week.
+    This test uses 1-hour time frame to verify statistics tracking.
     
     This test:
-    1. Gets initial usage statistics (7d timeframe)
+    1. Gets initial usage statistics (1h timeframe)
     2. Makes a request to DeepSeek R1 Free model
     3. Polls the statistics API every 30 seconds to see when usage is updated
     4. Reports the time it takes for usage to be reflected in statistics
     """
-    logger.info("🚀 Starting inference usage update timing test (7-day timeframe)")
+    logger.info("🚀 Starting inference usage update timing test (1-hour timeframe)")
     logger.info("=" * 80)
     
     base_url = config["base_url"]
     
     try:
         # Step 1: Get initial statistics
-        logger.info("\n📊 Step 1: Getting initial statistics (7d timeframe)...")
-        initial_stats = get_llm_statistics(base_url, auth_token, time_frame="7d")
+        logger.info("\n📊 Step 1: Getting initial statistics (1h timeframe)...")
+        initial_stats = get_llm_statistics(base_url, auth_token, time_frame="1h")
         
         assert initial_stats is not None, "Failed to get initial statistics"
         
@@ -211,7 +213,7 @@ def test_inference_usage_update_timing_7d(config, auth_token, api_key_scope_sess
         else:
             pytest.fail(f"Unexpected response type: {type(initial_stats)}")
         
-        logger.info(f"✅ Initial statistics retrieved (7d):")
+        logger.info(f"✅ Initial statistics retrieved (1h):")
         logger.info(f"   - Total requests: {initial_total_requests}")
         logger.info(f"   - Total tokens: {initial_total_tokens}")
         
@@ -244,7 +246,7 @@ def test_inference_usage_update_timing_7d(config, auth_token, api_key_scope_sess
         logger.info(f"   - Response preview: {response['choices'][0]['message']['content'][:100]}...")
         
         # Step 3: Poll statistics API to see when usage updates
-        logger.info("\n⏳ Step 3: Polling statistics API (7d) to detect usage update...")
+        logger.info("\n⏳ Step 3: Polling statistics API (1h) to detect usage update...")
         logger.info("   (Checking every 30 seconds, max 10 minutes)")
         
         max_attempts = 20  # 20 attempts * 30 seconds = 10 minutes max
@@ -256,7 +258,7 @@ def test_inference_usage_update_timing_7d(config, auth_token, api_key_scope_sess
             logger.info(f"\n   🔍 Attempt {attempt}/{max_attempts}...")
             time.sleep(poll_interval)
             
-            current_stats = get_llm_statistics(base_url, auth_token, time_frame="7d")
+            current_stats = get_llm_statistics(base_url, auth_token, time_frame="1h")
             
             if current_stats and current_stats.get("status") == "success":
                 # Use top-level total fields from API response
@@ -275,7 +277,7 @@ def test_inference_usage_update_timing_7d(config, auth_token, api_key_scope_sess
                     update_detected_at = datetime.now()
                     time_to_update = (update_detected_at - request_time).total_seconds()
                     
-                    logger.info(f"\n🎉 Usage update detected in 7d statistics!")
+                    logger.info(f"\n🎉 Usage update detected in 1h statistics!")
                     logger.info(f"   ✅ Request made at: {request_time.strftime('%H:%M:%S')}")
                     logger.info(f"   ✅ Update detected at: {update_detected_at.strftime('%H:%M:%S')}")
                     logger.info(f"   ✅ Time to update: {time_to_update:.0f} seconds ({time_to_update/60:.1f} minutes)")
@@ -289,13 +291,13 @@ def test_inference_usage_update_timing_7d(config, auth_token, api_key_scope_sess
         logger.info("\n" + "=" * 80)
         if usage_updated:
             time_to_update = (update_detected_at - request_time).total_seconds()
-            logger.info(f"✅ TEST RESULT (7d): Inference usage is updated within ~{time_to_update/60:.1f} minutes")
+            logger.info(f"✅ TEST RESULT (1h): Inference usage is updated within ~{time_to_update/60:.1f} minutes")
             logger.info(f"   (Exact time: {time_to_update:.0f} seconds)")
             
             # Assert that usage was updated (test passes)
             assert usage_updated, "Usage should be updated"
         else:
-            logger.error(f"❌ TEST RESULT (7d): Usage was NOT updated within {max_attempts * poll_interval / 60:.0f} minutes")
+            logger.error(f"❌ TEST RESULT (1h): Usage was NOT updated within {max_attempts * poll_interval / 60:.0f} minutes")
             logger.error("   This might indicate:")
             logger.error("   1. Statistics update delay is longer than expected")
             logger.error("   2. There might be an issue with the statistics tracking system")
